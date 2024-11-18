@@ -2,20 +2,19 @@ package com.billit.investment.controller;
 
 import com.billit.investment.dto.InvestmentRequest;
 import com.billit.investment.dto.InvestmentResponse;
+import com.billit.investment.domain.Investment;
 import com.billit.investment.service.InvestmentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/investments")
+@RequiredArgsConstructor
 public class InvestmentController {
 
     private final InvestmentService investmentService;
-
-    public InvestmentController(InvestmentService investmentService) {
-        this.investmentService = investmentService;
-    }
 
     @PostMapping
     public ResponseEntity<InvestmentResponse> createInvestment(@RequestBody InvestmentRequest request) {

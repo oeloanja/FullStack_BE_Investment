@@ -4,19 +4,17 @@ import com.billit.investment.domain.Investment;
 import com.billit.investment.dto.InvestmentRequest;
 import com.billit.investment.dto.InvestmentResponse;
 import com.billit.investment.repository.InvestmentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class InvestmentService {
 
     private final InvestmentRepository investmentRepository;
-
-    public InvestmentService(InvestmentRepository investmentRepository) {
-        this.investmentRepository = investmentRepository;
-    }
 
     public InvestmentResponse createInvestment(InvestmentRequest request) {
         Investment investment = new Investment();
