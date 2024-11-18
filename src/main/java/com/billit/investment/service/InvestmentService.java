@@ -1,12 +1,13 @@
 package com.billit.investment.service;
 
 import com.billit.investment.domain.Investment;
-import com.billit.investment.dto.InvestmentRequest;
+import com.billit.investment.dto.InvestCreateRequest;
 import com.billit.investment.dto.InvestmentResponse;
 import com.billit.investment.repository.InvestmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,16 +17,15 @@ public class InvestmentService {
 
     private final InvestmentRepository investmentRepository;
 
-    public InvestmentResponse createInvestment(InvestmentRequest request) {
+    public Investment createInvestment(InvestCreateRequest request) {
         Investment investment = new Investment();
+        investment.setGroupId(request.getGroupId());
         investment.setUserInvestorId(request.getUserInvestorId());
+        investment.setAccountInvestorId(request.getAccountInvestorId());
         investment.setInvestmentAmount(request.getInvestmentAmount());
-        investment.setInvestmentDate(request.getInvestmentDate());
-        investment.setStatus("대기");
-
-        Investment savedInvestment = investmentRepository.save(investment);
-
-        return new InvestmentResponse(savedInvestment.getInvestmentId(), savedInvestment.getInvestmentAmount(), savedInvestment.getStatus());
+        investment.setExpectedReturnRate(request.getExpectedReturnRate());
+        investment.setInvestmentDate(LocalDateTime.now());
+        return investmentRepository.save(investment);
     }
 
     public List<InvestmentResponse> getInvestmentsByUser(Long userId) {
