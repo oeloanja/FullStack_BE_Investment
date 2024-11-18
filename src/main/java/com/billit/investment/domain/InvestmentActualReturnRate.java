@@ -10,17 +10,13 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-public class Investment {
+public class InvestmentActualReturnRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer investmentId;
+    private Integer investmentReturnRateId;
 
-    private Integer groupId;
-    private Integer userInvestorId;
-    private Integer accountInvestorId;
-    private BigDecimal investmentAmount;
-    private LocalDateTime investmentDate;
-    private BigDecimal expectedReturnRate;
+    private Integer investmentId;
+    private BigDecimal actualReturnRate;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

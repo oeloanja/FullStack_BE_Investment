@@ -34,7 +34,7 @@ public class PortfolioService {
         InvestmentPortfolio savedPortfolio = portfolioRepository.save(portfolio);
 
         return new PortfolioResponse(
-                savedPortfolio.getId(),
+                savedPortfolio.getPortfolioId(),
                 savedPortfolio.getPortfolioName(),
                 savedPortfolio.getTotalInvestedAmount(),
                 savedPortfolio.getRiskLevel()
@@ -46,7 +46,7 @@ public class PortfolioService {
         List<InvestmentPortfolio> portfolios = portfolioRepository.findByUserInvestorId(userInvestorId);
         return portfolios.stream()
                 .map(portfolio -> new PortfolioResponse(
-                        portfolio.getId(),
+                        portfolio.getPortfolioId(),
                         portfolio.getPortfolioName(),
                         portfolio.getTotalInvestedAmount(),
                         portfolio.getRiskLevel()

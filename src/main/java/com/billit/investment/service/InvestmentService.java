@@ -27,13 +27,13 @@ public class InvestmentService {
 
         Investment savedInvestment = investmentRepository.save(investment);
 
-        return new InvestmentResponse(savedInvestment.getId(), savedInvestment.getInvestmentAmount(), savedInvestment.getStatus());
+        return new InvestmentResponse(savedInvestment.getInvestmentId(), savedInvestment.getInvestmentAmount(), savedInvestment.getStatus());
     }
 
     public List<InvestmentResponse> getInvestmentsByUser(Long userId) {
         List<Investment> investments = investmentRepository.findByUserInvestorId(userId);
         return investments.stream()
-                .map(investment -> new InvestmentResponse(investment.getId(), investment.getInvestmentAmount(), investment.getStatus()))
+                .map(investment -> new InvestmentResponse(investment.getInvestmentId(), investment.getInvestmentAmount(), investment.getStatus()))
                 .collect(Collectors.toList());
     }
 

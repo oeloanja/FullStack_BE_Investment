@@ -23,7 +23,13 @@ public class InvestmentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{userId}")
+    // 현숙언니가 부를 api
+    @PutMapping("/updateBalance")
+    public ResponseEntity<Void> updateBalance(@RequestBody InvestmentRequest request) {
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
     public ResponseEntity<List<InvestmentResponse>> getInvestmentsByUser(@PathVariable Long userId) {
         List<InvestmentResponse> investments = investmentService.getInvestmentsByUser(userId);
         return ResponseEntity.ok(investments);
