@@ -18,7 +18,7 @@ public class InvestmentController {
     private final InvestmentService investmentService;
     private final InvestStatusService investStatusService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<List<Investment>> createInvestment(@RequestBody List<InvestmentCreateRequest> requests) {
         List<Investment> investments = investmentService.createInvestments(requests);
         return ResponseEntity.ok(investments);
@@ -36,9 +36,9 @@ public class InvestmentController {
         return ResponseEntity.ok(investments);
     }
 
-    // 현숙언니가 부를 api
+    // 현숙언니 잔여 투자금을 찢어서 돌려줄 때 사용할 api - 매개변수 : group_id, 잔여금액 - 잔여금액이 0 초과면 흩뿌리고(민석오빠의 api를 호출) 0 이면 아무것도 안함
     @PutMapping("/updateBalance")
-    public ResponseEntity<Void> updateBalance(@RequestBody InvestmentCreateRequest request) {
+    public ResponseEntity<Void> refundInvestAmount() {
         return ResponseEntity.noContent().build();
     }
 
@@ -53,6 +53,12 @@ public class InvestmentController {
             @PathVariable Integer investmentId,
             @RequestParam InvestStatusType statusType) {
         InvestStatus status = investStatusService.updateInvestmentStatus(investmentId, statusType);
+        return ResponseEntity.ok(status);
+    }
+
+    @PutMapping("/{investmentId}/status")
+    public ResponseEntity<InvestStatus> cancelInvestment(@PathVariable Integer investmentId) {
+        InvestStatus status = investStatusService.cancelInvestment(investmentId);
         return ResponseEntity.ok(status);
     }
 }

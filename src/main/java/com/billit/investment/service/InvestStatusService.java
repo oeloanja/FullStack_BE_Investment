@@ -21,6 +21,5 @@ public class InvestStatusService {
     public InvestStatus cancelInvestment(Integer investmentId) {
         return updateInvestmentStatus(investmentId, InvestStatusType.valueOf("CANCELLED"));
     }
-
 }
 

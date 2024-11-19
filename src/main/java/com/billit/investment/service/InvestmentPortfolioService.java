@@ -1,51 +1,70 @@
 package com.billit.investment.service;
 
+import com.billit.investment.domain.Investment;
 import com.billit.investment.domain.InvestmentPortfolio;
 import com.billit.investment.dto.InvestmentPortfolioRequest;
 import com.billit.investment.repository.InvestmentPortfolioRepository;
+import com.billit.investment.repository.InvestmentRepository;
+import com.billit.investment.repository.SettlementDetailRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class InvestmentPortfolioService {
-    private final InvestmentPortfolioRepository portfolioRepository;
+    private final InvestmentRepository investmentRepository;
+    private final SettlementDetailRepository settlementDetailRepository;
+    private final InvestmentPortfolioRepository investmentPortfolioRepository;
 
-    // 포트폴리오 생성
-    public InvestmentPortfolio createPortfolio(InvestmentPortfolioRequest request) {
+    @Transactional
+    public InvestmentPortfolio createPortfolio(Integer userInvestorId) {
+        List<Investment> investments = investmentRepository.findByUserInvestorId(userInvestorId);
+
+        BigDecimal totalPrincipal = BigDecimal.ZERO;
+        BigDecimal totalProfit = BigDecimal.ZERO;
+
+        for (Investment investment : investments) {
+            totalPrincipal = totalPrincipal.add(settlementDetailRepository.findTotalPrincipalByInvestmentId(investment.getInvestmentId()));
+            totalProfit = totalProfit.add(settlementDetailRepository.findTotalProfitByInvestmentId(investment.getInvestmentId()));
+        }
+
         InvestmentPortfolio portfolio = new InvestmentPortfolio();
-        portfolio.setUserInvestorId(request.getUserInvestorId());
-        portfolio.setPortfolioName(request.getPortfolioName());
-        portfolio.setRiskLevel(request.getRiskLevel());
-        portfolio.setTargetReturnRate(request.getTargetReturnRate());
-        portfolio.setTotalInvestedAmount(request.getTotalInvestedAmount());
-        portfolio.setActualReturnValue(request.getActualReturnValue());
-        portfolio.setActualReturnRate(request.getActualReturnRate());
-        return portfolioRepository.save(portfolio);
+        portfolio.setUserInvestorId(userInvestorId);
+        portfolio.setTotalInvestedAmount(totalPrincipal);
+        portfolio.setActualReturnValue(totalProfit);
+        portfolio.setCreatedAt(LocalDateTime.now());
+
+        return portfolio;
     }
 
-    // 포트폴리오 갱신
-    public InvestmentPortfolio updatePortfolio(Integer portfolioId, InvestmentPortfolioRequest request) {
-        InvestmentPortfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
+    @Transactional
+    public void updatePortfolio(Integer userInvestorId) {
+        InvestmentPortfolio portfolio = investmentPortfolioRepository.findByUserInvestorIdReturnOptional(userInvestorId)
+                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));
 
-        portfolio.setTargetReturnRate(request.getTargetReturnRate());
-        portfolio.setTotalInvestedAmount(request.getTotalInvestedAmount());
-        portfolio.setActualReturnValue(request.getActualReturnValue());
-        portfolio.setActualReturnRate(request.getActualReturnRate());
-        return portfolioRepository.save(portfolio);
+        BigDecimal totalPrincipal = settlementDetailRepository.findTotalPrincipalByInvestorId(userInvestorId);
+        BigDecimal totalProfit = settlementDetailRepository.findTotalProfitByInvestorId(userInvestorId);
+
+        portfolio.setUserInvestorId(userInvestorId);
+        portfolio.setTotalInvestedAmount(totalPrincipal);
+        portfolio.setActualReturnValue(totalProfit);
+
+        investmentPortfolioRepository.save(portfolio);
     }
 
     // 사용자별 포트폴리오 조회
     public List<InvestmentPortfolio> getPortfoliosByUser(Integer userInvestorId) {
-        return portfolioRepository.findByUserInvestorId(userInvestorId);
+        return investmentPortfolioRepository.findByUserInvestorId(userInvestorId);
     }
 
     // 전체 포트폴리오 조회
     public List<InvestmentPortfolio> getAllPortfolios() {
-        return portfolioRepository.findAll();
+        return investmentPortfolioRepository.findAll();
     }
 }
 

@@ -24,6 +24,34 @@ public class InvestmentService {
 
     @Transactional
     public List<Investment> createInvestments(List<InvestmentCreateRequest> requests) {
+        if (requests.isEmpty()) {
+            throw new IllegalArgumentException("Investment request list cannot be empty");
+        }
+
+        Integer accountInvestorId = requests.get(0).getAccountInvestorId();
+        BigDecimal totalInvestmentAmount = requests.stream()
+                .map(InvestmentCreateRequest::getInvestmentAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 0단계: 투자자 계좌 잔액 확인
+        if (!validateInvestmentAmount(accountInvestorId, totalInvestmentAmount)) {
+            throw new IllegalStateException("Insufficient account balance for investment");
+        }
+
+        // 1단계: 투자금 출금
+        withdrawInvestmentAmount(accountInvestorId, totalInvestmentAmount);
+
+        // 2단계: 출금 확인
+        confirmWithdrawal(accountInvestorId, totalInvestmentAmount);
+
+        // 3단계: LoanGroupService에 투자금 입금
+        Integer groupId = requests.get(0).getGroupId();
+        depositToLoanGroup(groupId, totalInvestmentAmount);
+
+        // 4단계: 입금 확인
+        confirmDeposit(groupId, totalInvestmentAmount);
+
+        // 5단계: 투자 정보 저장
         List<Investment> investments = requests.stream().map(request -> {
             Investment investment = new Investment();
             investment.setGroupId(request.getGroupId());
@@ -35,6 +63,41 @@ public class InvestmentService {
         }).collect(Collectors.toList());
 
         return investmentRepository.saveAll(investments);
+    }
+
+    // api 호출 부분의 경우, 상대의 api를 확인하기
+    private boolean validateInvestmentAmount(Integer accountInvestorId, BigDecimal totalInvestmentAmount) {
+        String url = "http://user-service/api/accounts/" + accountInvestorId + "/balance";
+        BigDecimal accountBalance = restTemplate.getForObject(url, BigDecimal.class);
+        return accountBalance.compareTo(totalInvestmentAmount) >= 0;
+    }
+
+    private void withdrawInvestmentAmount(Integer accountInvestorId, BigDecimal amount) {
+        String url = "http://user-service/api/accounts/" + accountInvestorId + "/withdraw";
+        restTemplate.postForObject(url, amount, Void.class);
+    }
+
+    private void confirmWithdrawal(Integer accountInvestorId, BigDecimal amount) {
+        // 잔액을 다시 확인하여 출금 확인
+        String url = "http://user-service/api/accounts/" + accountInvestorId + "/balance";
+        BigDecimal accountBalance = restTemplate.getForObject(url, BigDecimal.class);
+        if (accountBalance.compareTo(amount) >= 0) {
+            throw new IllegalStateException("Withdrawal was not successful for amount: " + amount);
+        }
+    }
+
+    private void depositToLoanGroup(Integer groupId, BigDecimal amount) {
+        String url = "http://loan-group-service/api/groups/" + groupId + "/deposit";
+        restTemplate.postForObject(url, amount, Void.class);
+    }
+
+    private void confirmDeposit(Integer groupId, BigDecimal amount) {
+        // LoanGroupService의 입금 확인 API 호출
+        String url = "http://loan-group-service/api/groups/" + groupId + "/balance";
+        BigDecimal groupBalance = restTemplate.getForObject(url, BigDecimal.class);
+        if (groupBalance.compareTo(amount) < 0) {
+            throw new IllegalStateException("Deposit was not successful for amount: " + amount);
+        }
     }
 
     public List<Investment> updateInvestmentDatesByGroupId(Integer groupId) {
@@ -58,66 +121,5 @@ public class InvestmentService {
 
     public List<Investment> getInvestmentsByInvestor(Integer userInvestorId) {
         return investmentRepository.findByUserInvestorId(userInvestorId);
-    }
-
-    public boolean validateInvestmentAmount(Integer accountInvestorId, BigDecimal investmentAmount) {
-        // 외부 API 호출 (예: User API)
-        BigDecimal accountBalance = getAccountBalance(accountInvestorId);
-        return accountBalance.compareTo(investmentAmount) >= 0;
-    }
-
-    // 계좌 잔액 조회를 위한 외부 API 호출 메서드
-    private BigDecimal getAccountBalance(Integer accountInvestorId) {
-        // api 연결 전 테스트용
-        //return new BigDecimal("100000.00");
-        // 실제 코드
-        String url = "http://user-service/api/accounts/" + accountInvestorId + "/balance";
-        return restTemplate.getForObject(url, BigDecimal.class);
-    }
-
-    public Investment updateInvestmentExecutionDate(Integer investmentId) {
-        Investment investment = investmentRepository.findById(investmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
-        investment.setInvestmentDate(LocalDateTime.now());
-        return investmentRepository.save(investment);
-    }
-
-    public BigDecimal calculateSettlementAmount(Integer groupId) {
-        // 대출군 관련 데이터 및 투자 비율 계산 로직 추가
-        BigDecimal totalLoanAmount = loanGroupService.getTotalLoanAmount(groupId);
-        List<Investment> investments = investmentRepository.findByGroupId(groupId);
-
-        BigDecimal totalInvested = investments.stream()
-                .map(Investment::getInvestmentAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return investments.stream()
-                .map(investment -> investment.getInvestmentAmount()
-                        .divide(totalInvested, 2, RoundingMode.HALF_UP)
-                        .multiply(totalLoanAmount))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    // 수익률 계산, 삽입
-    public InvestmentActualReturnRate createActualReturnRate(Integer investmentId, BigDecimal actualReturnRate) {
-        InvestmentActualReturnRate rate = new InvestmentActualReturnRate();
-        rate.setInvestmentId(investmentId);
-        rate.setActualReturnRate(actualReturnRate);
-        return InvestmentActualReturnRateRepository.save(rate);
-    }
-
-    public Optional<InvestmentActualReturnRate> getActualReturnRate(Integer investmentId) {
-        return InvestmentActualReturnRateRepository.findByInvestmentId(investmentId);
-    }
-
-    public InvestmentActualReturnRate updateActualReturnRate(Integer investmentId, BigDecimal newRate) {
-        InvestmentActualReturnRate rate = InvestmentActualReturnRateRepository.findByInvestmentId(investmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Actual return rate not found for investment ID: " + investmentId));
-        rate.setActualReturnRate(newRate);
-        return InvestmentActualReturnRateRepository.save(rate);
-    }
-
-    public boolean actualReturnRateExists(Integer investmentId) {
-        return InvestmentActualReturnRateRepository.existsByInvestmentId(investmentId);
     }
 }

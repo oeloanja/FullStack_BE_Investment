@@ -4,8 +4,10 @@ import com.billit.investment.domain.InvestmentPortfolio;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InvestmentPortfolioRepository extends JpaRepository<InvestmentPortfolio, Integer> {
+    Optional<InvestmentPortfolio> findByUserInvestorIdReturnOptional(Integer userInvestorId);
     List<InvestmentPortfolio> findByUserInvestorId(Integer userInvestorId);
 }
 
