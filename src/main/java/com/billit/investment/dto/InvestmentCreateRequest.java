@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class InvestCreateRequest {
+public class InvestmentCreateRequest {
     private Integer groupId;
     private Integer userInvestorId;
     private Integer accountInvestorId;

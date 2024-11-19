@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS investment (
     user_investor_id INT NOT NULL,
     account_investor_id INT NOT NULL,
     investment_amount DECIMAL(15, 2) NOT NULL,
-    investment_date TIMESTAMP NOT NULL,
+    investment_date TIMESTAMP,
     expected_return_rate DECIMAL(5, 2) NOT NULL,
     created_at TIMESTAMP NOT NULL
 );
