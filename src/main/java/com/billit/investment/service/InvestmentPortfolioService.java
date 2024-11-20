@@ -2,15 +2,15 @@ package com.billit.investment.service;
 
 import com.billit.investment.domain.Investment;
 import com.billit.investment.domain.InvestmentPortfolio;
+import com.billit.investment.dto.InvestmentPortfolioRequest;
 import com.billit.investment.repository.InvestmentPortfolioRepository;
 import com.billit.investment.repository.InvestmentRepository;
-import com.billit.investment.repository.SettlementDetailRepository;
-import com.billit.investment.repository.SettlementRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,53 +18,74 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InvestmentPortfolioService {
     private final InvestmentRepository investmentRepository;
-    private final SettlementDetailRepository settlementDetailRepository;
     private final InvestmentPortfolioRepository investmentPortfolioRepository;
+    private final SettlementService settlementService;
 
     @Transactional
-    public InvestmentPortfolio createPortfolio(Integer userInvestorId) {
+    public InvestmentPortfolio createInvestmentPortfolio(InvestmentPortfolioRequest request) {
+        Integer userInvestorId = request.getUserInvestorId();
         List<Investment> investments = investmentRepository.findByUserInvestorId(userInvestorId);
 
-        BigDecimal totalPrincipal = BigDecimal.ZERO;
-        BigDecimal totalProfit = BigDecimal.ZERO;
+        BigDecimal totalInvestedAmount = BigDecimal.ZERO;
+        BigDecimal totalReturnValue = BigDecimal.ZERO;
 
         for (Investment investment : investments) {
-            totalPrincipal = totalPrincipal.add(settlementDetailRepository.findTotalPrincipalBySettlementId(investment.getInvestmentId()));
-            totalProfit = totalProfit.add(settlementDetailRepository.findTotalProfitBySettlementId(investment.getInvestmentId()));
+            Integer settelmentId = settlementService.getSettlementId(investment.getInvestmentId());
+            totalInvestedAmount = totalInvestedAmount.add(settlementService.getTotalSettlementPrincipal(settelmentId));
+            totalReturnValue = totalReturnValue.add(settlementService.getTotalSettlementProfit(settelmentId));
         }
+
+        BigDecimal totalReturnRate = totalReturnValue.divide(totalInvestedAmount, 2, RoundingMode.HALF_UP);
 
         InvestmentPortfolio portfolio = new InvestmentPortfolio();
         portfolio.setUserInvestorId(userInvestorId);
-        portfolio.setTotalInvestedAmount(totalPrincipal);
-        portfolio.setActualReturnValue(totalProfit);
+        portfolio.setTotalInvestedAmount(totalInvestedAmount);
+        portfolio.setTotalReturnValue(totalReturnValue);
+        portfolio.setTotalReturnRate(totalReturnRate);
         portfolio.setCreatedAt(LocalDateTime.now());
 
+        investmentPortfolioRepository.save(portfolio);
         return portfolio;
     }
 
-    @Transactional
-    public void updatePortfolio(Integer userInvestorId) {
-        InvestmentPortfolio portfolio = investmentPortfolioRepository.findByUserInvestorIdReturnOptional(userInvestorId)
+    public InvestmentPortfolio getPortfoliosByUser(Integer userInvestorId) {
+        InvestmentPortfolio portfolio = investmentPortfolioRepository
+                .findByUserInvestorId(userInvestorId)
                 .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));
-
-        BigDecimal totalPrincipal = settlementDetailRepository.findTotalPrincipalByInvestorId(userInvestorId);
-        BigDecimal totalProfit = settlementDetailRepository.findTotalProfitByInvestorId(userInvestorId);
-
-        portfolio.setUserInvestorId(userInvestorId);
-        portfolio.setTotalInvestedAmount(totalPrincipal);
-        portfolio.setActualReturnValue(totalProfit);
-
-        investmentPortfolioRepository.save(portfolio);
-    }
-
-    // 사용자별 포트폴리오 조회
-    public List<InvestmentPortfolio> getPortfoliosByUser(Integer userInvestorId) {
-        return investmentPortfolioRepository.findByUserInvestorId(userInvestorId);
+        return portfolio;
     }
 
     // 전체 포트폴리오 조회
     public List<InvestmentPortfolio> getAllPortfolios() {
         return investmentPortfolioRepository.findAll();
+    }
+
+    @Transactional
+    public InvestmentPortfolio updateInvestmentPortfolio(InvestmentPortfolioRequest request) {
+        Integer userInvestorId = request.getUserInvestorId();
+        InvestmentPortfolio portfolio = investmentPortfolioRepository
+                .findByUserInvestorId(userInvestorId)
+                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));
+        List<Investment> investments = investmentRepository.findByUserInvestorId(userInvestorId);
+
+        BigDecimal totalInvestedAmount = BigDecimal.ZERO;
+        BigDecimal totalReturnValue = BigDecimal.ZERO;
+
+        for (Investment investment : investments) {
+            Integer settelmentId = settlementService.getSettlementId(investment.getInvestmentId());
+            totalInvestedAmount = totalInvestedAmount.add(settlementService.getTotalSettlementPrincipal(settelmentId));
+            totalReturnValue = totalReturnValue.add(settlementService.getTotalSettlementProfit(settelmentId));
+        }
+
+        BigDecimal totalReturnRate = totalReturnValue.divide(totalInvestedAmount, 2, RoundingMode.HALF_UP);
+
+        portfolio.setTotalInvestedAmount(totalInvestedAmount);
+        portfolio.setTotalReturnValue(totalReturnValue);
+        portfolio.setTotalReturnRate(totalReturnRate);
+
+        investmentPortfolioRepository.save(portfolio);
+
+        return portfolio;
     }
 }
 

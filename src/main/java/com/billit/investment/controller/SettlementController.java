@@ -1,8 +1,6 @@
 package com.billit.investment.controller;
 
 import com.billit.investment.domain.InvestmentPortfolio;
-import com.billit.investment.dto.InvestmentPortfolioRequest;
-import com.billit.investment.service.InvestmentPortfolioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/portfolios")
+@RequestMapping("/api/v1/settlements")
 @RequiredArgsConstructor
-public class InvestmentPortfolioController {
-    private final InvestmentPortfolioService investmentPortfolioService;
-
+public class SettlementController {
+    //투자고유번호를 전달해서 생성하기
+    //투자고유번호로 정산찾기
+    //정산고유번호 전달해서 생성하기
+    //정산고유번호로 정산상세 찾기
     @PostMapping("/create")
-    public ResponseEntity<InvestmentPortfolio> createInvestmentPortfolio(@RequestBody InvestmentPortfolioRequest request) {
+    public ResponseEntity<InvestmentPortfolio> createSettlement(@RequestBody InvestmentPortfolioCreateRequest request) {
         return ResponseEntity.ok(investmentPortfolioService.createInvestmentPortfolio(request));
     }
 
@@ -26,15 +26,14 @@ public class InvestmentPortfolioController {
     }
 
     @GetMapping("/{userInvestorId}")
-    public ResponseEntity<InvestmentPortfolio> getInvestmentPortfoliosByUser(@PathVariable Integer userInvestorId) {
+    public ResponseEntity<List<InvestmentPortfolio>> getInvestmentPortfoliosByUser(@PathVariable Integer userInvestorId) {
         return ResponseEntity.ok(investmentPortfolioService.getPortfoliosByUser(userInvestorId));
     }
 
     @PutMapping("/{portfolioId}/update")
     public ResponseEntity<InvestmentPortfolio> updateInvestmentPortfolio(
             @PathVariable Integer portfolioId,
-            @RequestBody InvestmentPortfolioRequest request) {
-        return ResponseEntity.ok(investmentPortfolioService.updateInvestmentPortfolio(request));
+            @RequestBody InvestmentPortfolioCreateRequest request) {
+        return ResponseEntity.ok(investmentPortfolioService.updatePortfolio(portfolioId, request));
     }
 }
-

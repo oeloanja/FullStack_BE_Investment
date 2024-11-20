@@ -16,8 +16,6 @@ public class InvestmentPortfolio {
     private Integer portfolioId;
 
     private Integer userInvestorId;
-    private String riskLevel;
-    private BigDecimal targetReturnRate;
     private BigDecimal totalInvestedAmount;
     private BigDecimal totalReturnValue;
     private BigDecimal totalReturnRate;

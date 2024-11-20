@@ -10,12 +10,42 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SettlementService {
     private final SettlementRepository settlementRepository;
     private final SettlementDetailRepository settlementDetailRepository;
+
+    //정산 생성
+
+    //투자고유번호로 정산 찾기(레파지토리 사용)
+
+    //정산고유번호로 정산상세 찾기
+
+    //투자고유번호로 정산고유번호 찾기
+    public Integer getSettlementId(Integer investmentId) {
+        return settlementRepository.findById(investmentId).get().getSettlementId();
+    }
+
+    public BigDecimal getTotalSettlementPrincipal(Integer settlementId){
+        List<SettlementDetail> settlementDetails = settlementDetailRepository.findBySettlementId(settlementId);
+        BigDecimal totalSettlementPrincipal = BigDecimal.ZERO;
+        for (SettlementDetail settlementDetail : settlementDetails) {
+            totalSettlementPrincipal = totalSettlementPrincipal.add(settlementDetail.getSettlementPrincipal());
+        }
+        return totalSettlementPrincipal;
+    }
+
+    public BigDecimal getTotalSettlementProfit(Integer settlementId){
+        List<SettlementDetail> settlementDetails = settlementDetailRepository.findBySettlementId(settlementId);
+        BigDecimal totalSettlementProfit = BigDecimal.ZERO;
+        for (SettlementDetail settlementDetail : settlementDetails) {
+            totalSettlementProfit = totalSettlementProfit.add(settlementDetail.getSettlementProfit());
+        }
+        return totalSettlementProfit;
+    }
 
     @Transactional
     public void calculateSettlement(Integer investmentId, BigDecimal repaymentAmount) {

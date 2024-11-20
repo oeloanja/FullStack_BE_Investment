@@ -7,12 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Repository
 public interface SettlementDetailRepository extends JpaRepository<SettlementDetail, Integer> {
     // 이 두 친구들을 활용하는 부분 전부 고쳐야함(investmentId -> settlementId 활용하도록)
-    BigDecimal findTotalProfitBySettlementId(Integer settlementId);
-    BigDecimal findTotalPrincipalBySettlementId(Integer settlementId);
+    List<SettlementDetail> findBySettlementId(Integer settlementId);
 
     Integer countBySettlementId(Integer settlementId);
 

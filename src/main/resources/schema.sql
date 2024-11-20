@@ -26,8 +26,6 @@ CREATE TABLE IF NOT EXISTS investment_actual_return_rate (
 CREATE TABLE IF NOT EXISTS investment_portfolio (
     portfolio_id SERIAL PRIMARY KEY,
     user_investor_id INT NOT NULL,
-    risk_level VARCHAR(20) NOT NULL,
-    target_return_rate DECIMAL(5, 2) NOT NULL,
     total_invested_amount DECIMAL(15, 2) NOT NULL,
     total_return_value DECIMAL(15, 2) NOT NULL,
     total_return_rate DECIMAL(5, 2) NOT NULL,
