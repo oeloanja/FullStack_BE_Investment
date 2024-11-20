@@ -2,10 +2,10 @@ package com.billit.investment.service;
 
 import com.billit.investment.domain.Investment;
 import com.billit.investment.domain.InvestmentPortfolio;
-import com.billit.investment.dto.InvestmentPortfolioRequest;
 import com.billit.investment.repository.InvestmentPortfolioRepository;
 import com.billit.investment.repository.InvestmentRepository;
 import com.billit.investment.repository.SettlementDetailRepository;
+import com.billit.investment.repository.SettlementRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InvestmentPortfolioService {
     private final InvestmentRepository investmentRepository;
+    private final SettlementRepository settlementRepository;
     private final SettlementDetailRepository settlementDetailRepository;
     private final InvestmentPortfolioRepository investmentPortfolioRepository;
 
@@ -29,8 +30,8 @@ public class InvestmentPortfolioService {
         BigDecimal totalProfit = BigDecimal.ZERO;
 
         for (Investment investment : investments) {
-            totalPrincipal = totalPrincipal.add(settlementDetailRepository.findTotalPrincipalByInvestmentId(investment.getInvestmentId()));
-            totalProfit = totalProfit.add(settlementDetailRepository.findTotalProfitByInvestmentId(investment.getInvestmentId()));
+            totalPrincipal = totalPrincipal.add(settlementDetailRepository.findTotalPrincipalBySettlementId(investment.getInvestmentId()));
+            totalProfit = totalProfit.add(settlementDetailRepository.findTotalProfitBySettlementId(investment.getInvestmentId()));
         }
 
         InvestmentPortfolio portfolio = new InvestmentPortfolio();

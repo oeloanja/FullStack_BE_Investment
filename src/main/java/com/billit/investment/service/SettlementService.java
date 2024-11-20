@@ -22,7 +22,7 @@ public class SettlementService {
         Settlement settlement = settlementRepository.findByInvestmentId(investmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Settlement not found for investmentId: " + investmentId));
 
-        BigDecimal settlementAmount = repaymentAmount.multiply(BigDecimal.valueOf(settlement.getSettlementRatio()));
+        BigDecimal settlementAmount = repaymentAmount.multiply(settlement.getSettlementRatio());
         BigDecimal principal = calculatePrincipal(settlementAmount);
         BigDecimal profit = settlementAmount.subtract(principal);
 

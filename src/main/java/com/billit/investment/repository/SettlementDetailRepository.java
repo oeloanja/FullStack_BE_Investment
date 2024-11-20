@@ -10,8 +10,10 @@ import java.math.BigDecimal;
 
 @Repository
 public interface SettlementDetailRepository extends JpaRepository<SettlementDetail, Integer> {
-    BigDecimal findTotalProfitByInvestmentId(Integer investmentId);
-    BigDecimal findTotalPrincipalByInvestmentId(Integer investmentId);
+    // 이 두 친구들을 활용하는 부분 전부 고쳐야함(investmentId -> settlementId 활용하도록)
+    BigDecimal findTotalProfitBySettlementId(Integer settlementId);
+    BigDecimal findTotalPrincipalBySettlementId(Integer settlementId);
+
     Integer countBySettlementId(Integer settlementId);
 
     @Query("SELECT SUM(sd.settlementPrincipal) FROM SettlementDetail sd " +

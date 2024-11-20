@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Entity
@@ -13,11 +15,8 @@ public class Settlement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer settlementId;
 
-    @Column(nullable = false)
     private Integer investmentId;
-
-    @Column(nullable = false, precision = 10, scale = 8)
-    private Double settlementRatio;
+    private BigDecimal settlementRatio;
 }
 
 

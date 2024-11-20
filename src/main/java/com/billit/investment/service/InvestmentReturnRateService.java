@@ -21,8 +21,8 @@ public class InvestmentReturnRateService {
 
     @Transactional
     public void updateActualReturnRate(Integer investmentId) {
-        BigDecimal totalProfit = settlementDetailRepository.findTotalProfitByInvestmentId(investmentId);
-        BigDecimal investmentAmount = investmentRepository.findInvestmentAmountById(investmentId);
+        BigDecimal totalProfit = settlementDetailRepository.findTotalProfitBySettlementId(investmentId);
+        BigDecimal investmentAmount = investmentRepository.findInvestmentAmountByInvestmentId(investmentId);
 
         BigDecimal actualReturnRate = totalProfit.divide(investmentAmount, 2, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));

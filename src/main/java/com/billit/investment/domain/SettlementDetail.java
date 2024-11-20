@@ -13,22 +13,12 @@ import java.time.LocalDate;
 @Table(name = "settlement_detail")
 public class SettlementDetail {
     @Id
-    @Column(nullable = false)
     private Integer settlementId;
 
-    @Column(nullable = false)
     private Integer settlementTimes;
-
-    @Column(nullable = false)
     private LocalDate settlementDate;
-
-    @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal settlementPrincipal;
-
-    @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal settlementProfit;
-
-    @Column(nullable = false)
     private Boolean isCompleted;
 }
 

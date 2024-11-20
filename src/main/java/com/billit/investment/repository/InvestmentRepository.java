@@ -10,5 +10,5 @@ public interface InvestmentRepository extends JpaRepository<Investment, Integer>
     List<Investment> findByUserInvestorId(Integer userInvestorId);
     List<Investment> findByGroupId(Integer groupId);
 
-    BigDecimal findInvestmentAmountById(Integer investmentId);
+    BigDecimal findInvestmentAmountByInvestmentId(Integer investmentId);
 }

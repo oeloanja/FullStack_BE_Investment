@@ -1,5 +1,8 @@
 package com.billit.investment.domain;
 
+import lombok.Getter;
+
+@Getter
 public enum InvestStatusType {
     WATING(0, "투자 희망", "투자 신청이 완료되어 대출군과의 매칭을 대기하는 상태"),
     EXECUTING(1, "투자 중", "상환-정산이 진행되고 있는 상태"),
@@ -14,10 +17,6 @@ public enum InvestStatusType {
         this.code = code;
         this.description = description;
         this.detail = detail;
-    }
-
-    public int getCode() {
-        return code;
     }
 
     public static InvestStatusType fromCode(int code) {
