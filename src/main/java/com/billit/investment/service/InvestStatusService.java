@@ -11,6 +11,14 @@ import org.springframework.stereotype.Service;
 public class InvestStatusService {
     private final InvestStatusRepository investStatusRepository;
 
+    public InvestStatus createInvestmentStatus(Integer investmentId, InvestStatusType statusType) {
+        InvestStatus investStatus = new InvestStatus();
+        investStatus.setInvestmentId(investmentId);
+        investStatus.setInvestStatusType(statusType);
+
+        return investStatusRepository.save(investStatus);
+    }
+
     public InvestStatus updateInvestmentStatus(Integer investmentId, InvestStatusType statusType) {
         InvestStatus status = investStatusRepository.findById(investmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Investment ID not found"));
@@ -18,8 +26,15 @@ public class InvestStatusService {
         return investStatusRepository.save(status);
     }
 
-    public InvestStatus cancelInvestment(Integer investmentId) {
-        return updateInvestmentStatus(investmentId, InvestStatusType.valueOf("CANCELLED"));
+    public InvestStatus cancelInvestmentStatus(Integer investmentId) {
+        InvestStatus status = investStatusRepository.findById(investmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Investment ID not found"));
+        status.setInvestStatusType(InvestStatusType.valueOf("CANCELLED"));
+        return investStatusRepository.save(status);
+    }
+
+    public InvestStatus getInvestmentStatusByInvestmentId(Integer investmentId) {
+        return investStatusRepository.findByInvestmentId(investmentId);
     }
 }
 

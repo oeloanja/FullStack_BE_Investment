@@ -1,8 +1,10 @@
 package com.billit.investment.service;
 
+import com.billit.investment.domain.InvestStatus;
+import com.billit.investment.domain.InvestStatusType;
 import com.billit.investment.domain.Investment;
-import com.billit.investment.domain.InvestmentActualReturnRate;
 import com.billit.investment.dto.InvestmentCreateRequest;
+import com.billit.investment.repository.InvestStatusRepository;
 import com.billit.investment.repository.InvestmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -10,16 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class InvestmentService {
     private final InvestmentRepository investmentRepository;
+    private final InvestStatusService investStatusService;
     private final RestTemplate restTemplate;
 
     @Transactional
@@ -100,6 +101,14 @@ public class InvestmentService {
         }
     }
 
+    public List<Investment> getAllInvestments() {
+        return investmentRepository.findAll();
+    }
+
+    public List<Investment> getInvestmentsByInvestorId(Integer userInvestorId) {
+        return investmentRepository.findByUserInvestorId(userInvestorId);
+    }
+
     public List<Investment> updateInvestmentDatesByGroupId(Integer groupId) {
         List<Investment> investments = investmentRepository.findByGroupId(groupId);
         LocalDateTime nowTime = LocalDateTime.now();
@@ -110,16 +119,9 @@ public class InvestmentService {
 
         for (Investment investment : investments) {
             investment.setInvestmentDate(nowTime);
+            investStatusService.updateInvestmentStatus(investment.getInvestmentId(), InvestStatusType.valueOf("EXECUTING"));
         }
 
         return investmentRepository.saveAll(investments);
-    }
-
-    public List<Investment> getAllInvestments() {
-        return investmentRepository.findAll();
-    }
-
-    public List<Investment> getInvestmentsByInvestor(Integer userInvestorId) {
-        return investmentRepository.findByUserInvestorId(userInvestorId);
     }
 }

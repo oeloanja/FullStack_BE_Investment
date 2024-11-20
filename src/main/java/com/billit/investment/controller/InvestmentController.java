@@ -31,8 +31,8 @@ public class InvestmentController {
     }
 
     @GetMapping("/{userInvestorId}")
-    public ResponseEntity<List<Investment>> getInvestmentsByInvestor(@PathVariable Integer userInvestorId) {
-        List<Investment> investments = investmentService.getInvestmentsByInvestor(userInvestorId);
+    public ResponseEntity<List<Investment>> getInvestmentsByInvestorId(@PathVariable Integer userInvestorId) {
+        List<Investment> investments = investmentService.getInvestmentsByInvestorId(userInvestorId);
         return ResponseEntity.ok(investments);
     }
 
@@ -48,7 +48,21 @@ public class InvestmentController {
         return ResponseEntity.ok(updatedInvestments);
     }
 
-    @PostMapping("/{investmentId}/status")
+    @PostMapping("/{investmentId}/status/create")
+    public ResponseEntity<InvestStatus> createInvestmentStatus(
+            @PathVariable Integer investmentId,
+            @RequestParam InvestStatusType statusType) {
+        InvestStatus status = investStatusService.createInvestmentStatus(investmentId, statusType);
+        return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/{investmentId}/status")
+    public ResponseEntity<InvestStatus> getInvestmentStatus(@PathVariable Integer investmentId) {
+        InvestStatus status = investStatusService.getInvestmentStatusByInvestmentId(investmentId);
+        return ResponseEntity.ok(status);
+    }
+
+    @PutMapping("/{investmentId}/status/update")
     public ResponseEntity<InvestStatus> updateInvestmentStatus(
             @PathVariable Integer investmentId,
             @RequestParam InvestStatusType statusType) {
@@ -56,9 +70,9 @@ public class InvestmentController {
         return ResponseEntity.ok(status);
     }
 
-    @PutMapping("/{investmentId}/status")
+    @PutMapping("/{investmentId}/status/cancel")
     public ResponseEntity<InvestStatus> cancelInvestment(@PathVariable Integer investmentId) {
-        InvestStatus status = investStatusService.cancelInvestment(investmentId);
+        InvestStatus status = investStatusService.cancelInvestmentStatus(investmentId);
         return ResponseEntity.ok(status);
     }
 }
