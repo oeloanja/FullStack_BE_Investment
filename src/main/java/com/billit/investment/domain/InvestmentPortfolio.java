@@ -16,12 +16,11 @@ public class InvestmentPortfolio {
     private Integer portfolioId;
 
     private Integer userInvestorId;
-    private String portfolioName;
     private String riskLevel;
     private BigDecimal targetReturnRate;
     private BigDecimal totalInvestedAmount;
-    private BigDecimal actualReturnValue;
-    private BigDecimal actualReturnRate;
+    private BigDecimal totalReturnValue;
+    private BigDecimal totalReturnRate;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
