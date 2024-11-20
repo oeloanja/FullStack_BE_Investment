@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface InvestmentPortfolioRepository extends JpaRepository<InvestmentPortfolio, Integer> {
     List<InvestmentPortfolio> findByUserInvestorId(Integer userInvestorId);
-    
+
     @Query("SELECT p FROM InvestmentPortfolio p WHERE p.userInvestorId = :userInvestorId")
     Optional<InvestmentPortfolio> findByUserInvestorIdReturnOptional(@Param("userInvestorId") Integer userInvestorId);
 }

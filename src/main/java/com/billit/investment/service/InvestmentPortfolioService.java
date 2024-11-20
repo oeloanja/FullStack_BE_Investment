@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InvestmentPortfolioService {
     private final InvestmentRepository investmentRepository;
-    private final SettlementRepository settlementRepository;
     private final SettlementDetailRepository settlementDetailRepository;
     private final InvestmentPortfolioRepository investmentPortfolioRepository;
 

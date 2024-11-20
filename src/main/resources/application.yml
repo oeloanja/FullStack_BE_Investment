@@ -1,6 +1,6 @@
 spring:
   application:
-    name: investment
+    name: investment-service
   datasource:
     url: jdbc:postgresql://localhost:5432/investment_service
     username: joyeeun
