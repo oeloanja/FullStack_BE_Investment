@@ -30,9 +30,8 @@ public class InvestmentPortfolioController {
         return ResponseEntity.ok(investmentPortfolioService.getPortfoliosByUser(userInvestorId));
     }
 
-    @PutMapping("/{portfolioId}/update")
+    @PutMapping("/update")
     public ResponseEntity<InvestmentPortfolio> updateInvestmentPortfolio(
-            @PathVariable Integer portfolioId,
             @RequestBody InvestmentPortfolioRequest request) {
         return ResponseEntity.ok(investmentPortfolioService.updateInvestmentPortfolio(request));
     }

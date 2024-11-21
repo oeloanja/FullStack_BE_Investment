@@ -1,6 +1,5 @@
 package com.billit.investment.controller;
 
-import com.billit.investment.domain.InvestmentPortfolio;
 import com.billit.investment.domain.Settlement;
 import com.billit.investment.dto.SettlementCreateRequest;
 import com.billit.investment.service.SettlementService;
