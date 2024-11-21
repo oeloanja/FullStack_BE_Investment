@@ -3,6 +3,7 @@ package com.billit.investment.service;
 import com.billit.investment.domain.Investment;
 import com.billit.investment.domain.InvestmentPortfolio;
 import com.billit.investment.dto.InvestmentPortfolioRequest;
+import com.billit.investment.dto.SettlementPrincipalAndProfitGetResponse;
 import com.billit.investment.repository.InvestmentPortfolioRepository;
 import com.billit.investment.repository.InvestmentRepository;
 import jakarta.transaction.Transactional;
@@ -30,9 +31,9 @@ public class InvestmentPortfolioService {
         BigDecimal totalReturnValue = BigDecimal.ZERO;
 
         for (Investment investment : investments) {
-            Integer settelmentId = settlementService.getSettlementId(investment.getInvestmentId());
-            totalInvestedAmount = totalInvestedAmount.add(settlementService.getTotalSettlementPrincipal(settelmentId));
-            totalReturnValue = totalReturnValue.add(settlementService.getTotalSettlementProfit(settelmentId));
+            SettlementPrincipalAndProfitGetResponse response = settlementService.getTotalSettlementPrincipalAndProfit(investment.getInvestmentId());
+            totalInvestedAmount = totalInvestedAmount.add(response.getTotalSettlementPrincipal());
+            totalReturnValue = totalReturnValue.add(response.getTotalSettlementProfit());
         }
 
         BigDecimal totalReturnRate = totalReturnValue.divide(totalInvestedAmount, 2, RoundingMode.HALF_UP);
@@ -44,8 +45,7 @@ public class InvestmentPortfolioService {
         portfolio.setTotalReturnRate(totalReturnRate);
         portfolio.setCreatedAt(LocalDateTime.now());
 
-        investmentPortfolioRepository.save(portfolio);
-        return portfolio;
+        return investmentPortfolioRepository.save(portfolio);
     }
 
     public InvestmentPortfolio getPortfoliosByUser(Integer userInvestorId) {
@@ -72,9 +72,9 @@ public class InvestmentPortfolioService {
         BigDecimal totalReturnValue = BigDecimal.ZERO;
 
         for (Investment investment : investments) {
-            Integer settelmentId = settlementService.getSettlementId(investment.getInvestmentId());
-            totalInvestedAmount = totalInvestedAmount.add(settlementService.getTotalSettlementPrincipal(settelmentId));
-            totalReturnValue = totalReturnValue.add(settlementService.getTotalSettlementProfit(settelmentId));
+            SettlementPrincipalAndProfitGetResponse response = settlementService.getTotalSettlementPrincipalAndProfit(investment.getInvestmentId());
+            totalInvestedAmount = totalInvestedAmount.add(response.getTotalSettlementPrincipal());
+            totalReturnValue = totalReturnValue.add(response.getTotalSettlementProfit());
         }
 
         BigDecimal totalReturnRate = totalReturnValue.divide(totalInvestedAmount, 2, RoundingMode.HALF_UP);
@@ -85,8 +85,6 @@ public class InvestmentPortfolioService {
 
         investmentPortfolioRepository.save(portfolio);
 
-        return portfolio;
+        return investmentPortfolioRepository.save(portfolio);
     }
 }
-
-
