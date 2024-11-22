@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/portfolios")
+@RequestMapping("/api/v1/invest-service/portfolios")
 @RequiredArgsConstructor
 public class InvestmentPortfolioController {
     private final InvestmentPortfolioService investmentPortfolioService;

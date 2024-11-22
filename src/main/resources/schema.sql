@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS investment (
     investment_date TIMESTAMP,
     expected_return_rate DECIMAL(5, 2) NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    settlement_ratio DECIMAL(10, 8) NOT NULL
+    settlement_ratio DECIMAL(10, 8)
 );
 
 CREATE TABLE IF NOT EXISTS invest_status (

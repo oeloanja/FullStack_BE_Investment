@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@NoArgsConstructor
 public class InvestmentActualReturnRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

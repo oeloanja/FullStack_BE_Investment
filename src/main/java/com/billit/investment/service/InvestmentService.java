@@ -1,5 +1,9 @@
 package com.billit.investment.service;
 
+import com.billit.investment.connect.loan_group.client.LoanGroupServiceClient;
+import com.billit.investment.connect.loan_group.dto.LoanGroupRequestDto;
+import com.billit.investment.connect.user.client.UserServiceClient;
+import com.billit.investment.connect.user.dto.UserServiceRequestDto;
 import com.billit.investment.domain.InvestStatus;
 import com.billit.investment.domain.InvestStatusType;
 import com.billit.investment.domain.Investment;
@@ -30,6 +34,8 @@ public class InvestmentService {
     private final InvestmentActualReturnRateRepository investmentActualReturnRateRepository;
     private final RestTemplate restTemplate;
     private final SettlementService settlementService;
+    private final UserServiceClient userService;
+    private final LoanGroupServiceClient loanService;
 
     private static final Logger logger = LoggerFactory.getLogger(InvestmentService.class);
 
@@ -41,31 +47,40 @@ public class InvestmentService {
             throw new IllegalArgumentException("Investment request list is empty");
         }
 
-        Integer accountInvestorId = requests.get(0).getAccountInvestorId();
-        BigDecimal totalInvestmentAmount = requests.stream()
-                .map(InvestmentCreateRequest::getInvestmentAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//        Integer investorId = requests.get(0).getUserInvestorId();
+//        Integer accountInvestorId = requests.get(0).getAccountInvestorId();
+//        BigDecimal totalInvestmentAmount = requests.stream()
+//                .map(InvestmentCreateRequest::getInvestmentAmount)
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // 0단계: 투자자 계좌 잔액 확인
-        if (!validateInvestmentAmount(accountInvestorId, totalInvestmentAmount)) {
-            throw new IllegalStateException("Insufficient account balance for investment");
-        }
+//        if (!validateInvestmentAmount(accountInvestorId, investorId, totalInvestmentAmount)) {
+//            throw new IllegalStateException("Insufficient account balance for investment");
+//        }
 
         // 1단계: 투자금 출금
-        withdrawInvestmentAmount(accountInvestorId, totalInvestmentAmount);
+        //userService.withdrawInvest(Long.valueOf(accountInvestorId), totalInvestmentAmount);
 
         // 2단계: 출금 확인
-        confirmWithdrawal(accountInvestorId, totalInvestmentAmount);
+//        confirmWithdrawal(accountInvestorId, totalInvestmentAmount);
 
         // 3단계: LoanGroupService에 투자금 입금
-        Integer groupId = requests.get(0).getGroupId();
-        depositToLoanGroup(groupId, totalInvestmentAmount);
+//        Integer groupId = requests.get(0).getGroupId();
+//        depositToLoanGroup(groupId, totalInvestmentAmount);
 
         // 4단계: 입금 확인
-        confirmDeposit(groupId, totalInvestmentAmount);
+//        confirmDeposit(groupId, totalInvestmentAmount);
 
-        // 5단계: 투자 정보 저장
+
+        // 5단계: 투자 정보 저장 << 추후에 코드 수정 매우 필요
         List<Investment> investments = requests.stream().map(request -> {
+            LoanGroupRequestDto loanRequest = new LoanGroupRequestDto(request.getGroupId(), request.getInvestmentAmount());
+            UserServiceRequestDto userRequest = new UserServiceRequestDto(
+                    request.getAccountInvestorId(),
+                    request.getInvestmentAmount(),
+                    "투자금 출금");
+            userService.withdrawInvest(Long.valueOf(request.getUserInvestorId()), userRequest);
+            loanService.updatePlatformAccountBalance(loanRequest);
             Investment investment = new Investment();
             investment.setGroupId(request.getGroupId());
             investment.setUserInvestorId(request.getUserInvestorId());
@@ -79,39 +94,44 @@ public class InvestmentService {
     }
 
     // api 호출 부분의 경우, 상대의 api를 확인하기
-    private boolean validateInvestmentAmount(Integer accountInvestorId, BigDecimal totalInvestmentAmount) {
-        String url = "http://user-service/api/accounts/" + accountInvestorId + "/balance";
-        BigDecimal accountBalance = restTemplate.getForObject(url, BigDecimal.class);
-        return accountBalance.compareTo(totalInvestmentAmount) >= 0;
-    }
+    // 계좌 잔액 조회
+//    private boolean validateInvestmentAmount(Integer accountInvestorId, Integer userId, BigDecimal totalInvestmentAmount) {
+//        String url = "api/v1/user_service/accounts/transaction/invest/balance/"+accountInvestorId+"?userId="+userId;
+//        BigDecimal accountBalance = restTemplate.getForObject(url, BigDecimal.class);
+//        return accountBalance.compareTo(totalInvestmentAmount) >= 0;
+//    }
 
-    private void withdrawInvestmentAmount(Integer accountInvestorId, BigDecimal amount) {
-        String url = "http://user-service/api/accounts/" + accountInvestorId + "/withdraw";
-        restTemplate.postForObject(url, amount, Void.class);
-    }
+    // 사용자 계좌에서 출금
+//    private void withdrawInvestmentAmount(Integer accountInvestorId, BigDecimal amount) {
+//        String url = "http://user-service/api/accounts/" + accountInvestorId + "/withdraw";
+//        restTemplate.postForObject(url, amount, Void.class);
+//    }
 
-    private void confirmWithdrawal(Integer accountInvestorId, BigDecimal amount) {
-        // 잔액을 다시 확인하여 출금 확인
-        String url = "http://user-service/api/accounts/" + accountInvestorId + "/balance";
-        BigDecimal accountBalance = restTemplate.getForObject(url, BigDecimal.class);
-        if (accountBalance.compareTo(amount) >= 0) {
-            throw new IllegalStateException("Withdrawal was not successful for amount: " + amount);
-        }
-    }
+//    // 출금 확인?
+//    private void confirmWithdrawal(Integer accountInvestorId, BigDecimal amount) {
+//        // 잔액을 다시 확인하여 출금 확인
+//        String url = "http://user-service/api/accounts/" + accountInvestorId + "/balance";
+//        BigDecimal accountBalance = restTemplate.getForObject(url, BigDecimal.class);
+//        if (accountBalance.compareTo(amount) >= 0) {
+//            throw new IllegalStateException("Withdrawal was not successful for amount: " + amount);
+//        }
+//    }
 
-    private void depositToLoanGroup(Integer groupId, BigDecimal amount) {
-        String url = "http://loan-group-service/api/groups/" + groupId + "/deposit";
-        restTemplate.postForObject(url, amount, Void.class);
-    }
+    // 투자 진행
+//    private void depositToLoanGroup(Integer groupId, BigDecimal amount) {
+//        String url = "http://loan-group-service/api/groups/" + groupId + "/deposit";
+//        restTemplate.postForObject(url, amount, Void.class);
+//    }
 
-    private void confirmDeposit(Integer groupId, BigDecimal amount) {
-        // LoanGroupService의 입금 확인 API 호출
-        String url = "http://loan-group-service/api/groups/" + groupId + "/balance";
-        BigDecimal groupBalance = restTemplate.getForObject(url, BigDecimal.class);
-        if (groupBalance.compareTo(amount) < 0) {
-            throw new IllegalStateException("Deposit was not successful for amount: " + amount);
-        }
-    }
+    // 입금 됐는지 확인
+//    private void confirmDeposit(Integer groupId, BigDecimal amount) {
+//        // LoanGroupService의 입금 확인 API 호출
+//        String url = "http://loan-group-service/api/groups/" + groupId + "/balance";
+//        BigDecimal groupBalance = restTemplate.getForObject(url, BigDecimal.class);
+//        if (groupBalance.compareTo(amount) < 0) {
+//            throw new IllegalStateException("Deposit was not successful for amount: " + amount);
+//        }
+//    }
 
     public List<InvestmentWithInvestStatusGetResponse> getAllInvestmentWithInvestStatus() {
         List<Object[]> results = investmentRepository.findInvestmentWithStatus();
@@ -231,7 +251,12 @@ public class InvestmentService {
 
             try {
                 // 투자자 계좌 입금 API 호출
-                boolean isDeposited = userService.depositToAccount(investment.getUserInvestorId(), settlementAmount);
+                UserServiceRequestDto depositRequest = new UserServiceRequestDto(
+                        investment.getAccountInvestorId(),
+                        settlementAmount,
+                        "투자금 입금"
+                );
+                boolean isDeposited = userService.depositToAccount(Long.valueOf(investment.getUserInvestorId()), depositRequest);
 
                 if (isDeposited) {
                     settlementService.createSettlement(SettlementCreateRequest.builder()
@@ -262,8 +287,14 @@ public class InvestmentService {
             BigDecimal settlementRatio = investment.getSettlementRatio();
             BigDecimal depositAmount = request.getRemainingAmount().multiply(settlementRatio);
 
+            UserServiceRequestDto refundRequest = new UserServiceRequestDto(
+                    investment.getAccountInvestorId(),
+                    depositAmount,
+                    "차액 입금"
+            );
+
             // 투자자 계좌 입금 API 호출 : 확인 필요
-            boolean isDeposited = userService.depositToAccount(investment.getUserInvestorId(), depositAmount);
+            boolean isDeposited = userService.depositToAccount(Long.valueOf(investment.getUserInvestorId()), refundRequest);
 
             if (isDeposited) {
                 investment.setInvestmentAmount(investment.getInvestmentAmount().subtract(depositAmount));
@@ -273,8 +304,6 @@ public class InvestmentService {
             }
         });
     }
-
-
 
     /* invest_status */
     public InvestStatus createInvestmentStatus(Integer investmentId, InvestStatusType statusType) {

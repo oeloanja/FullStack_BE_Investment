@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/investments")
+@RequestMapping("/api/v1/invest-service/investments")
 @RequiredArgsConstructor
 public class InvestmentController {
     private final InvestmentService investmentService;
@@ -52,7 +52,7 @@ public class InvestmentController {
     }
 
     // 현숙언니가 부를 api (투자정산비율 업데이트할 때)
-    @PutMapping("/group/{groupId}/updateSettlementRatio")
+    @PutMapping("/group/updateSettlementRatio")
     public ResponseEntity<List<Investment>> updateSettlementRatio(@RequestBody InvestmentSettlementRatioUpdateRequest request) {
         List<Investment> updatedInvestments = investmentService.updateSettlementRatio(request);
         return ResponseEntity.ok(updatedInvestments);
