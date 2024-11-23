@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "user-service", url = "http://localhost:8085", configuration = FeignConfig.class)
 public interface UserServiceClient {
     @PostMapping("/api/v1/user-service/accounts/transaction/invest/deposit")
-    boolean depositToAccount(@RequestParam Long userId,
+    ResponseEntity<String> depositToAccount(@RequestParam Long userId,
                              @RequestBody UserServiceRequestDto request);
 
-    @PostMapping("/api/v1/user_service/accounts/transaction/invest/withdraw")
+    @PostMapping("/api/v1/user-service/accounts/transaction/invest/withdraw")
     ResponseEntity<String> withdrawInvest(@RequestParam Long userId,
                                           @RequestBody UserServiceRequestDto request);
 

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum InvestStatusType {
-    WATING(0, "투자 희망", "투자 신청이 완료되어 대출군과의 매칭을 대기하는 상태"),
+    WAITING(0, "투자 희망", "투자 신청이 완료되어 대출군과의 매칭을 대기하는 상태"),
     EXECUTING(1, "투자 중", "상환-정산이 진행되고 있는 상태"),
     COMPLETED(2, "정산 완료", "마지막 정산이 완료된 상태"),
     CANCELED(3, "투자 취소", "투자자가 투자 희망 상태에서 투자 신청을 취소한 상태");

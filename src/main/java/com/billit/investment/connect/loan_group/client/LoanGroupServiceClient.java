@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "loan-group-service", url = "localhost:8084")
 public interface LoanGroupServiceClient {
-    @PutMapping("/api/v1/loan_group/account/invest")
+    @PutMapping("/api/v1/loan-group-service/account/invest")
     ResponseEntity<String> updatePlatformAccountBalance(
             @RequestBody LoanGroupRequestDto request
             );

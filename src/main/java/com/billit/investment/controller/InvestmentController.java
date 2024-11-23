@@ -46,9 +46,10 @@ public class InvestmentController {
 
     // 현숙언니가 부를 api (투자일시 업데이트할 때)
     @PutMapping("/group/{groupId}/updateInvestmentDate")
-    public ResponseEntity<List<Investment>> updateInvestmentDatesByGroupId(@PathVariable Integer groupId) {
-        List<Investment> updatedInvestments = investmentService.updateInvestmentDatesByGroupId(groupId);
-        return ResponseEntity.ok(updatedInvestments);
+    public ResponseEntity<String> updateInvestmentDatesByGroupId(@PathVariable Integer groupId) {
+        investmentService.updateInvestmentDatesByGroupId(groupId);
+        String response = "success";
+        return ResponseEntity.ok(response);
     }
 
     // 현숙언니가 부를 api (투자정산비율 업데이트할 때)
