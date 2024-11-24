@@ -1,30 +1,14 @@
-package com.billit.investment.domain;
+package com.billit.investment.dto;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-public class Investment {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class InvestmentRequest {
     private Long userInvestorId;
     private BigDecimal investmentAmount;
     private LocalDateTime investmentDate;
-    private String status; // 예: 대기, 진행 중, 취소됨
 
     // Getters and Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getUserInvestorId() {
         return userInvestorId;
@@ -48,13 +32,5 @@ public class Investment {
 
     public void setInvestmentDate(LocalDateTime investmentDate) {
         this.investmentDate = investmentDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

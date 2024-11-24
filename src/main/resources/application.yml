@@ -1,6 +1,6 @@
 spring:
   application:
-    name: investment-service
+    name: investment
   datasource:
     url: jdbc:postgresql://localhost:5432/investment_service
     username: joyeeun
@@ -8,14 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
-    show-sql: true
-  sql:
-    init:
-      mode: always
-server:
-  port: 8081
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
