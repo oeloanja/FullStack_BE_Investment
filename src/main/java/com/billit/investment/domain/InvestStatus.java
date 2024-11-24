@@ -1,20 +1,21 @@
 package com.billit.investment.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class InvestStatus {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer investmentId;
 
-    @OneToOne
-    @JoinColumn(name = "investment_id")
-    private Investment investment;
-
-    private String statusType; // 예: 대기, 진행 중, 취소됨
-
-    // Getters and Setters
+    @Convert(converter = InvestStatusTypeConverter.class)
+    private InvestStatusType investStatusType;
 }
+
 

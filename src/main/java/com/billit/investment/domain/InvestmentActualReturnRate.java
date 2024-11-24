@@ -13,15 +13,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class InvestmentPortfolio {
+public class InvestmentActualReturnRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer portfolioId;
+    private Integer investmentReturnRateId;
 
-    private Integer userInvestorId;
-    private BigDecimal totalInvestedAmount;
-    private BigDecimal totalReturnValue;
-    private BigDecimal totalReturnRate;
+    private Integer investmentId;
+    private BigDecimal actualReturnRate;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -31,3 +29,4 @@ public class InvestmentPortfolio {
         createdAt = LocalDateTime.now();
     }
 }
+
