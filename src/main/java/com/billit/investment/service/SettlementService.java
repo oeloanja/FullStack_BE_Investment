@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SettlementService {
     private final SettlementRepository settlementRepository;
-    private final InvestmentService investmentService;
 
     public Settlement createSettlement(SettlementCreateRequest request){
         Settlement settlement = new Settlement();
