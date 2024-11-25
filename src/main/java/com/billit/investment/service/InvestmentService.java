@@ -37,6 +37,7 @@ public class InvestmentService {
     private final InvestStatusRepository investStatusRepository;
     private final InvestmentActualReturnRateRepository investmentActualReturnRateRepository;
     private final RestTemplate restTemplate;
+    private final InvestmentPortfolioService investmentPortfolioService;
     private final SettlementService settlementService;
     private final UserServiceClient userServiceClient;
     private final LoanGroupServiceClient loanGroupServiceClient;
@@ -256,11 +257,21 @@ public class InvestmentService {
                    throw new RuntimeException("정산금 입금 실패");
                }
 
-                    settlementService.createSettlement(SettlementCreateRequest.builder()
-                            .investmentId(investment.getInvestmentId())
-                            .settlementPrincipal(settlementPrincipal)
-                            .settlementProfit(settlementProfit)
-                            .build());
+               settlementService.createSettlement(SettlementCreateRequest.builder()
+                       .investmentId(investment.getInvestmentId())
+                       .settlementPrincipal(settlementPrincipal)
+                       .settlementProfit(settlementProfit)
+                       .build());
+
+               InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
+               investmentPortfolioRequest.setUserInvestorId(investment.getUserInvestorId());
+               if(investmentPortfolioService.isExistPortfolio(investmentPortfolioRequest)){
+                   investmentPortfolioService.updateInvestmentPortfolio(investmentPortfolioRequest);
+               }
+               else{
+                   investmentPortfolioService.createInvestmentPortfolio(investmentPortfolioRequest);
+               }
+
             } catch (Exception e) {
                 // 2-4. 예외 발생 시 상세 로그 기록
                 logger.error("Error during deposit for Investment ID: {}, User Investor ID: {}, Amount: {}. Error: {}",

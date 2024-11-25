@@ -48,11 +48,15 @@ public class InvestmentPortfolioService {
         return investmentPortfolioRepository.save(portfolio);
     }
 
-    public InvestmentPortfolio getPortfoliosByUser(Integer userInvestorId) {
+    public InvestmentPortfolio getPortfoliosByUserInvestorId(Integer userInvestorId) {
         InvestmentPortfolio portfolio = investmentPortfolioRepository
                 .findByUserInvestorId(userInvestorId)
                 .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));
         return portfolio;
+    }
+
+    public boolean isExistPortfolio(InvestmentPortfolioRequest request) {
+        return investmentPortfolioRepository.existsById(request.getUserInvestorId());
     }
 
     // 전체 포트폴리오 조회

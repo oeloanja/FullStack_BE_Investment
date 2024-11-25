@@ -8,4 +8,3 @@ import java.util.Optional;
 public interface InvestStatusRepository extends JpaRepository<InvestStatus, Integer> {
     InvestStatus findByInvestmentId(Integer investmentId);
 }
-

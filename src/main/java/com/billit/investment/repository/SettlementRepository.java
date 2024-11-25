@@ -8,4 +8,3 @@ import java.util.List;
 public interface SettlementRepository extends JpaRepository<Settlement, Integer> {
     List<Settlement> findByInvestmentId(Integer investmentId);
 }
-

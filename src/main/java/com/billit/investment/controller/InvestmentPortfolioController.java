@@ -25,9 +25,14 @@ public class InvestmentPortfolioController {
         return ResponseEntity.ok(investmentPortfolioService.getAllPortfolios());
     }
 
+    @GetMapping("/exist")
+    public boolean isExistPortfolio(@RequestBody InvestmentPortfolioRequest request){
+        return investmentPortfolioService.isExistPortfolio(request);
+    }
+
     @GetMapping("/{userInvestorId}")
     public ResponseEntity<InvestmentPortfolio> getInvestmentPortfoliosByUser(@PathVariable Integer userInvestorId) {
-        return ResponseEntity.ok(investmentPortfolioService.getPortfoliosByUser(userInvestorId));
+        return ResponseEntity.ok(investmentPortfolioService.getPortfoliosByUserInvestorId(userInvestorId));
     }
 
     @PutMapping("/update")
