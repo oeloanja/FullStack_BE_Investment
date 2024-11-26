@@ -1,12 +1,13 @@
 services:
   mysql-loan:
     container_name: mysql-loan
+    platform: linux/amd64
     image: mysql:latest
     ports:
       - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=user_service
+      - MYSQL_DATABASE=loan_service
     networks:
       - msa-network
     healthcheck:
@@ -17,6 +18,7 @@ services:
 
   mysql-user:
     container_name: mysql-user
+    platform: linux/amd64
     image: mysql:latest
     ports:
       - "3309:3306"
@@ -33,6 +35,7 @@ services:
 
   mysql-loan-group:
     container_name: mysql-loan-group
+    platform: linux/amd64
     image: mysql:latest
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
@@ -49,26 +52,28 @@ services:
       timeout: 10s
       retries: 3
 
-#  postgres-invest:
-#    container_name: postgres-invest
-#    image: postgres:latest
-#    restart: always
-#    ports:
-#      - "5432:5432"
-#    environment:
-#      - POSTGRES_USER=joyeeun
-#      - POSTGRES_PASSWORD=dPdmsdk?0928
-#      - POSTGRES_DB=investment_service
-#    networks:
-#      - msa-network
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready -U joyeeun" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
+  postgres-invest:
+    container_name: postgres-invest
+    platform: linux/amd64
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=joyeeun
+      - POSTGRES_PASSWORD=dPdmsdk?0928
+      - POSTGRES_DB=investment_service
+    networks:
+      - msa-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U joyeeun" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   postgres-repayment:
     container_name: postgres-repayment
+    platform: linux/amd64
     image: postgres:latest
     restart: always
     ports:
@@ -87,6 +92,7 @@ services:
 
   redis:
     container_name: redis
+    platform: linux/amd64
     image: redis:latest
     restart: always
     ports:
@@ -97,6 +103,7 @@ services:
 
   gateway-service:
     container_name: gateway-service
+    platform: linux/amd64
     image: sooook/gateway-service:latest
     restart: on-failure
     ports:
@@ -111,6 +118,7 @@ services:
 
   eureka-service:
     container_name: eureka-service
+    platform: linux/amd64
     image: sooook/eureka-service
     ports:
       - "8761:8761"
@@ -125,16 +133,22 @@ services:
 
   loan-group-service:
     container_name: loan-group-service
+    platform: linux/amd64
     image: sooook/loan-group-service:latest
     restart: on-failure
     ports:
       - "8084:8084"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql:///mysql-loan-group:3306/loan_group_service?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-loan-group:3306/loan_group_service?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_PROFILES_ACTIVE=docker
+      #      - LOAN_GROUP_SERVICE_URL=http://loan-group-service:8084
+      - USER_SERVICE_URL=http://user-service:8085
+      - INVEST_SERVICE_URL=http://invest-service:8081
+      - REPAYMENT_SERVICE_URL=http://repayment-service:8082
+      - LOAN_SERVICE_URL=http://loan-service:8083
     networks:
       - msa-network
     depends_on:
@@ -147,6 +161,7 @@ services:
 
   loan-service:
     container_name: loan-service
+    platform: linux/amd64
     image: sooook/loan-service:latest
     restart: on-failure
     ports:
@@ -157,6 +172,11 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_PROFILES_ACTIVE=docker
+      - LOAN_GROUP_SERVICE_URL=http://loan-group-service:8084
+      - USER_SERVICE_URL=http://user-service:8085
+      - INVEST_SERVICE_URL=http://invest-service:8081
+      - REPAYMENT_SERVICE_URL=http://repayment-service:8082
+    #      - LOAN_SERVICE_URL=http://loan-service:8083
     networks:
       - msa-network
     depends_on:
@@ -167,6 +187,7 @@ services:
 
   user-service:
     container_name: user-service
+    platform: linux/amd64
     image: sooook/user-service:latest
     restart: on-failure
     ports:
@@ -177,6 +198,11 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_PROFILES_ACTIVE=docker
+      - LOAN_GROUP_SERVICE_URL=http://loan-group-service:8084
+      #      - USER_SERVICE_URL=http://user-service:8085
+      - INVEST_SERVICE_URL=http://invest-service:8081
+      - REPAYMENT_SERVICE_URL=http://repayment-service:8082
+      - LOAN_SERVICE_URL=http://loan-service:8083
     networks:
       - msa-network
     depends_on:
@@ -189,6 +215,7 @@ services:
 
 #  invest-service:
 #    container_name: invest-service
+#    platform: linux/amd64
 #    image: sooook/investment-service:latest
 #    restart: on-failure
 #    ports:
@@ -199,6 +226,11 @@ services:
 #      - SPRING_DATASOURCE_USERNAME=joyeeun
 #      - SPRING_DATASOURCE_PASSWORD=dPdmsdk?0928
 #      - SPRING_PROFILES_ACTIVE=docker
+#      - LOAN_GROUP_SERVICE_URL=http://loan-group-service:8084
+#      - USER_SERVICE_URL=http://user-service:8085
+#      #      - INVEST_SERVICE_URL=http://invest-service:8081
+#      - REPAYMENT_SERVICE_URL=http://repayment-service:8082
+#      - LOAN_SERVICE_URL=http://loan-service:8083
 #    networks:
 #      - msa-network
 #    depends_on:
@@ -209,6 +241,7 @@ services:
 
   repayment-service:
     container_name: repayment-service
+    platform: linux/amd64
     image: sooook/repayment-service:latest
     restart: on-failure
     ports:
@@ -219,6 +252,11 @@ services:
       - SPRING_DATASOURCE_USERNAME=joyeeun
       - SPRING_DATASOURCE_PASSWORD=dPdmsdk?0928
       - SPRING_PROFILES_ACTIVE=docker
+      - LOAN_GROUP_SERVICE_URL=http://loan-group-service:8084
+      - USER_SERVICE_URL=http://user-service:8085
+      - INVEST_SERVICE_URL=http://invest-service:8081
+      #      - REPAYMENT_SERVICE_URL=http://repayment-service:8082
+      - LOAN_SERVICE_URL=http://loan-service:8083
     networks:
       - msa-network
     depends_on:
