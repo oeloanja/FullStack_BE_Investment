@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "loan-group-service", url = "localhost:8084")
+@FeignClient(name = "loan-group-service", url="${feign.client.config.loan-group-service.url}")
 public interface LoanGroupServiceClient {
     @PutMapping("/api/v1/loan-group-service/account/invest")
     ResponseEntity<String> updatePlatformAccountBalance(
