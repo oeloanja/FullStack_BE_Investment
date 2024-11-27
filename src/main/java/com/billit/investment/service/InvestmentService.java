@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,7 +35,6 @@ public class InvestmentService {
     private final InvestmentRepository investmentRepository;
     private final InvestStatusRepository investStatusRepository;
     private final InvestmentActualReturnRateRepository investmentActualReturnRateRepository;
-    private final RestTemplate restTemplate;
     private final InvestmentPortfolioService investmentPortfolioService;
     private final SettlementService settlementService;
     private final UserServiceClient userServiceClient;

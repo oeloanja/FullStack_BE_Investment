@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
   sql:
     init:
@@ -23,16 +23,22 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
+
 feign:
   client:
     config:
       loan-group-service:
-        url: ${LOAN_GROUP_SERVICE_URL:http://loan-group-service:8084}
-#      invest-service:
-#        url: ${INVEST_SERVICE_URL:http://invest-service:8081}
+        url: ${LOAN_GROUP_SERVICE_URL:http://localhost:8084}
+      invest-service:
+        url: ${INVEST_SERVICE_URL:http://localhost:8081}
       repayment-service:
-        url: ${REPAYMENT_SERVICE_URL:http://repayment-service:8082}
+        url: ${REPAYMENT_SERVICE_URL:http://localhost:8082}
       loan-service:
-        url: ${LOAN_SERVICE_URL:http://loan-service:8083}
+        url: ${LOAN_SERVICE_URL:http://localhost:8083}
       user-service:
-        url: ${USER_SERVICE_URL:http://user-service:8085}
+        url: ${USER_SERVICE_URL:http://localhost:8085}
+
+logging:
+  level:
+    feign:
+      logger: DEBUG

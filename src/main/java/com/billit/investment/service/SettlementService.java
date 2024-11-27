@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public class SettlementService {
         Settlement settlement = new Settlement();
         settlement.setInvestmentId(request.getInvestmentId());
         settlement.setSettlementPrincipal(request.getSettlementPrincipal());
-        settlement.setSettlementPrincipal(request.getSettlementProfit());
+        settlement.setSettlementProfit(request.getSettlementProfit());
 
         return settlementRepository.save(settlement);
     }

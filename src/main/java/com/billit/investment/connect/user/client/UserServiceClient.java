@@ -8,13 +8,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "user-service", url="${feign.client.config.user-service.url}", configuration = FeignConfig.class)
+@FeignClient(name = "USER-SERVICE",
+        configuration = FeignConfig.class,
+        path = "/api/v1/user-service",
+        url = "${feign.client.config.user-service.url}")
 public interface UserServiceClient {
-    @PostMapping("/api/v1/user-service/accounts/transaction/invest/deposit")
+    @PostMapping("/accounts/transaction/invest/deposit")
     ResponseEntity<String> depositToAccount(@RequestParam Long userId,
                              @RequestBody UserServiceRequestDto request);
 
-    @PostMapping("/api/v1/user-service/accounts/transaction/invest/withdraw")
+    @PostMapping("/accounts/transaction/invest/withdraw")
     ResponseEntity<String> withdrawInvest(@RequestParam Long userId,
                                           @RequestBody UserServiceRequestDto request);
 
