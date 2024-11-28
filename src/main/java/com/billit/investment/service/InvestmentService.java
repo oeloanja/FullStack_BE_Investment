@@ -260,6 +260,10 @@ public class InvestmentService {
                        .settlementProfit(settlementProfit)
                        .build());
 
+               // 실제 수익률 생성 및 계산
+               InvestmentActualReturnRateCreateRequest investmentActualReturnRateCreateRequest = new InvestmentActualReturnRateCreateRequest(investment.getUserInvestorId());
+               createInvestmentActualReturnRate(investmentActualReturnRateCreateRequest);
+
                InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
                investmentPortfolioRequest.setUserInvestorId(investment.getUserInvestorId());
                if(investmentPortfolioService.isExistPortfolio(investmentPortfolioRequest)){
