@@ -231,7 +231,6 @@ public class InvestmentService {
 
             BigDecimal settlementPrincipal = repaymentPrincipal
                     .multiply(settlementRatio)
-                    .multiply(feeRatio)
                     .setScale(2, RoundingMode.HALF_UP);
 
             BigDecimal settlementProfit = repaymentInterest
