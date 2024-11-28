@@ -116,14 +116,15 @@ public class InvestmentService {
         return investment;
     }
 
-    public List<InvestmentWithInvestStatusGetResponse> getAllInvestmentWithInvestStatus() {
+    public List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getAllInvestmentWithInvestStatusWithInvestmentActualRate() {
         List<Object[]> results = investmentRepository.findInvestmentWithStatus();
         return results.stream()
                 .map(result -> {
                     Investment investment = (Investment) result[0];
                     InvestStatus investStatus = (InvestStatus) result[1];
+                    InvestmentActualReturnRate investmentActualReturnRate = getLatestInvestmentActualReturnRateByInvestmentId(investment.getInvestmentId());
 
-                    return InvestmentWithInvestStatusGetResponse.builder()
+                    return InvestmentWithInvestStatusWithInvestmentActualRateGetResponse.builder()
                             .investmentId(investment.getInvestmentId())
                             .groupId(investment.getGroupId())
                             .userInvestorId(investment.getUserInvestorId())
@@ -134,19 +135,21 @@ public class InvestmentService {
                             .createdAt(investment.getCreatedAt())
                             .investStatusType(investStatus.getInvestStatusType().getCode())
                             .settlementRatio(investment.getSettlementRatio())
+                            .actualReturnRate(investmentActualReturnRate.getActualReturnRate())
                             .build();
                 })
                 .collect(Collectors.toList());
     }
 
-    public List<InvestmentWithInvestStatusGetResponse> getInvestmentWithInvestStatusByInvestorId(Integer userInvestorId) {
+    public List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getInvestmentWithInvestStatusWithInvestmentActualRateByInvestorId(Integer userInvestorId) {
         List<Object[]> results = investmentRepository.findInvestmentWithStatusByUserInvestorId(userInvestorId);
         return results.stream()
                 .map(result -> {
                     Investment investment = (Investment) result[0];
                     InvestStatus investStatus = (InvestStatus) result[1];
+                    InvestmentActualReturnRate investmentActualReturnRate = getLatestInvestmentActualReturnRateByInvestmentId(investment.getInvestmentId());
 
-                    return InvestmentWithInvestStatusGetResponse.builder()
+                    return InvestmentWithInvestStatusWithInvestmentActualRateGetResponse.builder()
                             .investmentId(investment.getInvestmentId())
                             .groupId(investment.getGroupId())
                             .userInvestorId(investment.getUserInvestorId())
@@ -156,6 +159,7 @@ public class InvestmentService {
                             .expectedReturnRate(investment.getExpectedReturnRate())
                             .createdAt(investment.getCreatedAt())
                             .investStatusType(investStatus.getInvestStatusType().getCode())
+                            .actualReturnRate(investmentActualReturnRate.getActualReturnRate())
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -231,7 +235,6 @@ public class InvestmentService {
 
             BigDecimal settlementPrincipal = repaymentPrincipal
                     .multiply(settlementRatio)
-                    .multiply(feeRatio)
                     .setScale(2, RoundingMode.HALF_UP);
 
             BigDecimal settlementProfit = repaymentInterest
@@ -260,6 +263,10 @@ public class InvestmentService {
                        .settlementPrincipal(settlementPrincipal)
                        .settlementProfit(settlementProfit)
                        .build());
+
+               // 실제 수익률 생성 및 계산
+               InvestmentActualReturnRateCreateRequest investmentActualReturnRateCreateRequest = new InvestmentActualReturnRateCreateRequest(investment.getUserInvestorId());
+               createInvestmentActualReturnRate(investmentActualReturnRateCreateRequest);
 
                InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
                investmentPortfolioRequest.setUserInvestorId(investment.getUserInvestorId());
