@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class InvestmentWithInvestStatusGetResponse {
+public class InvestmentWithInvestStatusWithInvestmentActualRateGetResponse {
     private Integer investmentId;
     private Integer groupId;
     private Integer userInvestorId;
@@ -19,4 +19,5 @@ public class InvestmentWithInvestStatusGetResponse {
     private LocalDateTime createdAt;
     private Integer investStatusType;
     private BigDecimal settlementRatio;
+    private BigDecimal actualReturnRate;
 }
