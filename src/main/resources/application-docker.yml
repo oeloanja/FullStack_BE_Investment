@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: investment-service
+  datasource:
+    url: jdbc:postgresql://postgres-invest:5432/investment_service
+    username: joyeeun
+    password: dPdmsdk?0928
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  sql:
+    init:
+      mode: always
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    register-with-eureka: true
+    fetch-registry: true
+
+feign:
+  client:
+    config:
+      loan-group-service:
+        url: ${LOAN_GROUP_SERVICE_URL:http://loan-group-service:8084}
+#      invest-service:
+#        url: ${INVEST_SERVICE_URL:http://invest-service:8081}
+      repayment-service:
+        url: ${REPAYMENT_SERVICE_URL:http://repayment-service:8082}
+      loan-service:
+        url: ${LOAN_SERVICE_URL:http://loan-service:8083}
+      user-service:
+        url: ${USER_SERVICE_URL:http://user-service:8085}

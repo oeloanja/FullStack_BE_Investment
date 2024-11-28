@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
   sql:
     init:
@@ -17,26 +17,28 @@ server:
   port: 8081
 
 eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: host.docker.internal
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
 
-
 feign:
   client:
     config:
       loan-group-service:
-        url: ${LOAN_GROUP_SERVICE_URL:http://localhost:8084}
+        url: ${LOAN_GROUP_SERVICE_URL:http://host.docker.internal:8084}
       invest-service:
-        url: ${INVEST_SERVICE_URL:http://localhost:8081}
+        url: ${INVEST_SERVICE_URL:http://host.docker.internal:8081}
       repayment-service:
-        url: ${REPAYMENT_SERVICE_URL:http://localhost:8082}
+        url: ${REPAYMENT_SERVICE_URL:http://host.docker.internal:8082}
       loan-service:
-        url: ${LOAN_SERVICE_URL:http://localhost:8083}
+        url: ${LOAN_SERVICE_URL:http://host.docker.internal:8083}
       user-service:
-        url: ${USER_SERVICE_URL:http://localhost:8085}
+        url: ${USER_SERVICE_URL:http://host.docker.internal:8085}
 
 logging:
   level:
