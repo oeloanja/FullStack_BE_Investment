@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface InvestmentPortfolioRepository extends JpaRepository<InvestmentPortfolio, Integer> {
     Optional<InvestmentPortfolio> findByUserInvestorId(Integer userInvestorId);
+    boolean existsByUserInvestorId(Integer userInvestorId);
 }

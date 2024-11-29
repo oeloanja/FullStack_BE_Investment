@@ -59,7 +59,7 @@ public class InvestmentPortfolioService {
     }
 
     public boolean isExistPortfolio(InvestmentPortfolioRequest request) {
-        return investmentPortfolioRepository.existsById(request.getUserInvestorId());
+        return investmentPortfolioRepository.existsByUserInvestorId(request.getUserInvestorId());
     }
 
     // 전체 포트폴리오 조회
@@ -91,8 +91,6 @@ public class InvestmentPortfolioService {
         portfolio.setTotalInvestedAmount(totalInvestedAmount);
         portfolio.setTotalReturnValue(totalReturnValue);
         portfolio.setTotalReturnRate(totalReturnRate);
-
-        investmentPortfolioRepository.save(portfolio);
 
         return investmentPortfolioRepository.save(portfolio);
     }
