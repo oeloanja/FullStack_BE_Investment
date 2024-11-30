@@ -58,37 +58,40 @@ public class InvestmentService {
         List<Investment> investments = requests.stream()
                 .map(request -> {
                     try {
-                        Investment investment = processInvestmentRequest(request);
-                        Investment savedInvestment = investmentRepository.save(investment);
+                        // 1. Investment 엔티티 생성 및 저장
+                        Investment investment = new Investment();
+                        investment.setGroupId(request.getGroupId());
+                        investment.setUserInvestorId(request.getUserInvestorId());
+                        investment.setAccountInvestorId(request.getAccountInvestorId());
+                        investment.setInvestmentAmount(request.getInvestmentAmount());
+                        investment.setExpectedReturnRate(request.getExpectedReturnRate());
 
-                        try {
-                            createInvestmentStatus(savedInvestment.getInvestmentId(), InvestStatusType.WAITING);
-                        } catch (Exception e) {
-                            log.error("Failed to create investment status for investment ID: {}",
-                                    savedInvestment.getInvestmentId(), e);
-                            throw e;
-                        }
+                        Investment savedInvestment = investmentRepository.save(investment);
+                        investmentRepository.flush(); // DB에 즉시 반영
+
+                        // 2. Investment Status 생성
+                        InvestStatus investStatus = new InvestStatus();
+                        investStatus.setInvestmentId(savedInvestment.getInvestmentId());
+                        investStatus.setInvestStatusType(InvestStatusType.WAITING);
+                        investStatusRepository.save(investStatus);
+                        investStatusRepository.flush(); // DB에 즉시 반영
+
+                        // 3. 투자금 처리
+                        processInvestmentTransaction(request);
 
                         return savedInvestment;
                     } catch (Exception e) {
                         log.error("Failed to process investment request: {}", request, e);
-                        return null;
+                        throw e; // 예외 발생시 트랜잭션 롤백
                     }
                 })
-                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        if (investments.isEmpty()) {
-            throw new RuntimeException("Failed to create any investments");
-        }
-
-        investmentRepository.flush();
         entityManager.clear();
-
         return investments;
     }
 
-    private Investment processInvestmentRequest(InvestmentCreateRequest request) {
+    private void processInvestmentTransaction(InvestmentCreateRequest request) {
         if (request.getGroupId() == null || request.getGroupId()<0) {
             throw new IllegalArgumentException("Invalid groupId: " + request.getGroupId());
         }
@@ -114,14 +117,6 @@ public class InvestmentService {
             log.error("Feign call failed: status={}, body={}", e.status(), e.contentUTF8(), e);
             throw new RuntimeException("투자금 입금 실패: " + e.contentUTF8(), e);
         }
-
-        Investment investment = new Investment();
-        investment.setGroupId(request.getGroupId());
-        investment.setUserInvestorId(request.getUserInvestorId());
-        investment.setAccountInvestorId(request.getAccountInvestorId());
-        investment.setInvestmentAmount(request.getInvestmentAmount());
-        investment.setExpectedReturnRate(request.getExpectedReturnRate());
-        return investment;
     }
 
     public List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getAllInvestmentWithInvestStatusWithInvestmentActualRate() {
