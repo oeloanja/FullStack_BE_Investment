@@ -13,6 +13,8 @@ import com.billit.investment.repository.InvestStatusRepository;
 import com.billit.investment.repository.InvestmentActualReturnRateRepository;
 import com.billit.investment.repository.InvestmentRepository;
 import feign.FeignException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,9 @@ public class InvestmentService {
     private final SettlementService settlementService;
     private final UserServiceClient userServiceClient;
     private final LoanGroupServiceClient loanGroupServiceClient;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private static final Logger logger = LoggerFactory.getLogger(InvestmentService.class);
 
@@ -76,6 +81,9 @@ public class InvestmentService {
         if (investments.isEmpty()) {
             throw new RuntimeException("Failed to create any investments");
         }
+
+        investmentRepository.flush();
+        entityManager.clear();
 
         return investments;
     }
