@@ -20,7 +20,6 @@ import java.util.List;
 public class InvestmentPortfolioService {
     private final InvestmentRepository investmentRepository;
     private final InvestmentPortfolioRepository investmentPortfolioRepository;
-    private final InvestmentService investmentService;
     private final SettlementService settlementService;
 
     @Transactional
