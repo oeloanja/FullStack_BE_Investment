@@ -265,7 +265,7 @@ public class InvestmentService {
                        .build());
 
                // 실제 수익률 생성 및 계산
-               InvestmentActualReturnRateCreateRequest investmentActualReturnRateCreateRequest = new InvestmentActualReturnRateCreateRequest(investment.getUserInvestorId());
+               InvestmentActualReturnRateCreateRequest investmentActualReturnRateCreateRequest = new InvestmentActualReturnRateCreateRequest(investment.getInvestmentId());
                createInvestmentActualReturnRate(investmentActualReturnRateCreateRequest);
 
                InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();

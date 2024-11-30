@@ -59,7 +59,7 @@ public class InvestmentPortfolioService {
     }
 
     public boolean isExistPortfolio(InvestmentPortfolioRequest request) {
-        return investmentPortfolioRepository.existsById(request.getUserInvestorId());
+        return investmentPortfolioRepository.existsByUserInvestorId(request.getUserInvestorId());
     }
 
     // 전체 포트폴리오 조회
@@ -76,21 +76,21 @@ public class InvestmentPortfolioService {
         List<Investment> investments = investmentRepository.findByUserInvestorId(userInvestorId);
 
         BigDecimal totalInvestedAmount = BigDecimal.ZERO;
+        BigDecimal totalPrincipal = BigDecimal.ZERO;
         BigDecimal totalReturnValue = BigDecimal.ZERO;
 
         for (Investment investment : investments) {
             SettlementPrincipalAndProfitGetResponse response = settlementService.getTotalSettlementPrincipalAndProfit(investment.getInvestmentId());
-            totalInvestedAmount = totalInvestedAmount.add(response.getTotalSettlementPrincipal());
+            totalInvestedAmount = totalInvestedAmount.add(investment.getInvestmentAmount());
+            totalPrincipal = totalPrincipal.add(response.getTotalSettlementPrincipal());
             totalReturnValue = totalReturnValue.add(response.getTotalSettlementProfit());
         }
 
-        BigDecimal totalReturnRate = totalReturnValue.divide(totalInvestedAmount, 2, RoundingMode.HALF_UP);
+        BigDecimal totalReturnRate = totalReturnValue.divide(totalPrincipal, 2, RoundingMode.HALF_UP);
 
         portfolio.setTotalInvestedAmount(totalInvestedAmount);
         portfolio.setTotalReturnValue(totalReturnValue);
         portfolio.setTotalReturnRate(totalReturnRate);
-
-        investmentPortfolioRepository.save(portfolio);
 
         return investmentPortfolioRepository.save(portfolio);
     }
