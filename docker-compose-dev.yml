@@ -27,6 +27,8 @@ services:
       - MYSQL_DATABASE=user_service
     networks:
       - msa-network
+    volumes:
+      - mysql-user-data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 30s
@@ -158,9 +160,11 @@ services:
 
   user-service:
     container_name: user-service
-    platform: linux/amd64
-    image: sooook/user-service:latest
-    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./src:/app/src
     ports:
       - "8085:8085"
     environment:
@@ -170,7 +174,6 @@ services:
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_PROFILES_ACTIVE=docker
       - LOAN_GROUP_SERVICE_URL=http://loan-group-service:8084
-      #      - USER_SERVICE_URL=http://user-service:8085
       - INVEST_SERVICE_URL=http://invest-service:8081
       - REPAYMENT_SERVICE_URL=http://repayment-service:8082
       - LOAN_SERVICE_URL=http://loan-service:8083
@@ -213,11 +216,9 @@ services:
         condition: service_started
   invest-service:
     container_name: invest-service
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./src:/app/src
+    platform: linux/amd64
+    image: sooook/invest-service:latest
+    restart: on-failure
     ports:
       - "8081:8081"
     environment:
@@ -228,6 +229,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - LOAN_GROUP_SERVICE_URL=http://loan-group-service:8084
       - USER_SERVICE_URL=http://user-service:8085
+      #      - INVEST_SERVICE_URL=http://invest-service:8081
       - REPAYMENT_SERVICE_URL=http://repayment-service:8082
       - LOAN_SERVICE_URL=http://loan-service:8083
     networks:
@@ -263,6 +265,9 @@ services:
         condition: service_healthy
       eureka-service:
         condition: service_healthy
+
+volumes:
+  mysql-user-data:
 
 networks:
   msa-network:
