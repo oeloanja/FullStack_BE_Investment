@@ -65,6 +65,8 @@ services:
       - POSTGRES_USER=joyeeun
       - POSTGRES_PASSWORD=dPdmsdk?0928
       - POSTGRES_DB=investment_service
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    command: postgres -c listen_addresses='*'
     networks:
       - msa-network
     healthcheck:
@@ -84,6 +86,8 @@ services:
       - POSTGRES_USER=joyeeun
       - POSTGRES_PASSWORD=dPdmsdk?0928
       - POSTGRES_DB=repayment_service
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    command: postgres -c listen_addresses='*'
     networks:
       - msa-network
     healthcheck:
