@@ -76,7 +76,17 @@ public class InvestmentService {
                         investStatusRepository.save(investStatus);
                         investStatusRepository.flush(); // DB에 즉시 반영
 
-                        // 3. 투자금 처리
+                        // 3. Investment Portfolio 생성 or 업데이트
+                        InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
+                        investmentPortfolioRequest.setUserInvestorId(request.getUserInvestorId());
+                        if(investmentPortfolioService.isExistPortfolio(investmentPortfolioRequest)){
+                            investmentPortfolioService.updateInvestmentPortfolio(investmentPortfolioRequest);
+                        }
+                        else{
+                            investmentPortfolioService.createInvestmentPortfolio(investmentPortfolioRequest);
+                        }
+
+                        // 4. 투자금 처리
                         processInvestmentTransaction(request);
 
                         return savedInvestment;
@@ -138,7 +148,7 @@ public class InvestmentService {
                             .createdAt(investment.getCreatedAt())
                             .investStatusType(investStatus.getInvestStatusType().getCode())
                             .settlementRatio(investment.getSettlementRatio())
-                            .actualReturnRate(investmentActualReturnRate.getActualReturnRate())
+                            .actualReturnRate(investmentActualReturnRate != null ? investmentActualReturnRate.getActualReturnRate() : null)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -162,7 +172,7 @@ public class InvestmentService {
                             .expectedReturnRate(investment.getExpectedReturnRate())
                             .createdAt(investment.getCreatedAt())
                             .investStatusType(investStatus.getInvestStatusType().getCode())
-                            .actualReturnRate(investmentActualReturnRate.getActualReturnRate())
+                            .actualReturnRate(investmentActualReturnRate != null ? investmentActualReturnRate.getActualReturnRate() : null)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -271,15 +281,9 @@ public class InvestmentService {
                InvestmentActualReturnRateCreateRequest investmentActualReturnRateCreateRequest = new InvestmentActualReturnRateCreateRequest(investment.getInvestmentId());
                createInvestmentActualReturnRate(investmentActualReturnRateCreateRequest);
 
-               InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
-               investmentPortfolioRequest.setUserInvestorId(investment.getUserInvestorId());
-               if(investmentPortfolioService.isExistPortfolio(investmentPortfolioRequest)){
-                   investmentPortfolioService.updateInvestmentPortfolio(investmentPortfolioRequest);
-               }
-               else{
-                   investmentPortfolioService.createInvestmentPortfolio(investmentPortfolioRequest);
-               }
-
+                InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
+                investmentPortfolioRequest.setUserInvestorId(investment.getUserInvestorId());
+                investmentPortfolioService.updateInvestmentPortfolio(investmentPortfolioRequest);
             } catch (Exception e) {
                 // 2-4. 예외 발생 시 상세 로그 기록
                 logger.error("Error during deposit for Investment ID: {}, User Investor ID: {}, Amount: {}. Error: {}",
@@ -380,6 +384,6 @@ public class InvestmentService {
         return investmentActualReturnRateRepository.findByInvestmentId(investmentId)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("No InvestmentActualReturnRate found!"));
+                .orElse(null);
     }
 }
