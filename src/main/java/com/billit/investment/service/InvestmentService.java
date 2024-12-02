@@ -77,13 +77,10 @@ public class InvestmentService {
                         investStatusRepository.save(investStatus);
                         investStatusRepository.flush(); // DB에 즉시 반영
 
-                        // 3. Investment Portfolio 생성 or 업데이트
+                        // 3. Investment Portfolio 생성(없는 경우에만)
                         InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
                         investmentPortfolioRequest.setUserInvestorId(request.getUserInvestorId());
-                        if(investmentPortfolioService.isExistPortfolio(investmentPortfolioRequest)){
-                            investmentPortfolioService.updateInvestmentPortfolio(investmentPortfolioRequest);
-                        }
-                        else{
+                        if(!investmentPortfolioService.isExistPortfolio(investmentPortfolioRequest)){
                             investmentPortfolioService.createInvestmentPortfolio(investmentPortfolioRequest);
                         }
 
@@ -223,8 +220,12 @@ public class InvestmentService {
                         .orElseThrow(() -> new IllegalArgumentException("Investment status not found"));
                 status.setInvestStatusType(InvestStatusType.valueOf("EXECUTING"));
                 investStatusRepository.save(status);
-            });
 
+                // 포트폴리오 상태 업데이트
+                InvestmentPortfolioRequest investmentPortfolioRequest = new InvestmentPortfolioRequest();
+                investmentPortfolioRequest.setUserInvestorId(investment.getUserInvestorId());
+                investmentPortfolioService.updateInvestmentPortfolio(investmentPortfolioRequest);
+            });
             investmentRepository.saveAll(investments);
         } catch (Exception e) {
             log.error("Failed to update investment dates for groupId: {}", groupId, e);
