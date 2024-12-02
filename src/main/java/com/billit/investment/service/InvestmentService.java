@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -172,6 +173,7 @@ public class InvestmentService {
                             .expectedReturnRate(investment.getExpectedReturnRate())
                             .createdAt(investment.getCreatedAt())
                             .investStatusType(investStatus.getInvestStatusType().getCode())
+                            .settlementRatio(investment.getSettlementRatio())
                             .actualReturnRate(investmentActualReturnRate != null ? investmentActualReturnRate.getActualReturnRate() : null)
                             .build();
                 })
@@ -179,8 +181,10 @@ public class InvestmentService {
     }
 
     public InvestmentWithInvestStatusWithInvestmentActualRateGetResponse getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(Integer investmentId) {
-        Object[] result = investmentRepository.findInvestmentWithStatusByInvestmentId(investmentId)
-                .orElseThrow(()->new IllegalArgumentException("Investment not found : " + investmentId +"is Wrong investment id"));
+        Optional<Object[]> resultOptional = investmentRepository.findInvestmentWithStatusByInvestmentId(investmentId);
+
+        Object[] result = resultOptional.orElseThrow(() ->
+                new IllegalArgumentException("Investment not found : " + investmentId + " is Wrong investment id"));
 
         Investment investment = (Investment) result[0];
         InvestStatus investStatus = (InvestStatus) result[1];
@@ -196,6 +200,7 @@ public class InvestmentService {
                 .expectedReturnRate(investment.getExpectedReturnRate())
                 .createdAt(investment.getCreatedAt())
                 .investStatusType(investStatus.getInvestStatusType().getCode())
+                .settlementRatio(investment.getSettlementRatio())
                 .actualReturnRate(investmentActualReturnRate != null ? investmentActualReturnRate.getActualReturnRate() : null)
                 .build();
     }

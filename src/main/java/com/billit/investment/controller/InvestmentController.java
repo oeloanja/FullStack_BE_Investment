@@ -31,14 +31,14 @@ public class InvestmentController {
         return ResponseEntity.ok(results);
     }
 
-    @GetMapping("/{userInvestorId}")
-    public ResponseEntity<List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse>> getInvestmentWithInvestStatusWithInvestmentActualRateByUserInvestorId(@PathVariable Integer userInvestorId) {
+    @GetMapping("/list")
+    public ResponseEntity<List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse>> getInvestmentWithInvestStatusWithInvestmentActualRateByUserInvestorId(@RequestParam Integer userInvestorId) {
         List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> results = investmentService.getInvestmentWithInvestStatusWithInvestmentActualRateByInvestorId(userInvestorId);
         return ResponseEntity.ok(results);
     }
 
-    @GetMapping("/{investmentId}")
-    public ResponseEntity<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(@PathVariable Integer investmentId) {
+    @GetMapping("/detail")
+    public ResponseEntity<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(@RequestParam Integer investmentId) {
         InvestmentWithInvestStatusWithInvestmentActualRateGetResponse result = investmentService.getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(investmentId);
         return ResponseEntity.ok(result);
     }
