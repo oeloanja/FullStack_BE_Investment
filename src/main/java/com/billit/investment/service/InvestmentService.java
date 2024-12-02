@@ -181,13 +181,13 @@ public class InvestmentService {
     }
 
     public InvestmentWithInvestStatusWithInvestmentActualRateGetResponse getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(Integer investmentId) {
-        Optional<Object[]> resultOptional = investmentRepository.findInvestmentWithStatusByInvestmentId(investmentId);
+        Optional<InvestmentWithStatusDTO> resultOptional = investmentRepository.findInvestmentWithStatusByInvestmentId(investmentId);
 
-        Object[] result = resultOptional.orElseThrow(() ->
+        InvestmentWithStatusDTO result = resultOptional.orElseThrow(() ->
                 new IllegalArgumentException("Investment not found : " + investmentId + " is Wrong investment id"));
 
-        Investment investment = (Investment) result[0];
-        InvestStatus investStatus = (InvestStatus) result[1];
+        Investment investment = result.getInvestment();
+        InvestStatus investStatus = result.getInvestStatus();
         InvestmentActualReturnRate investmentActualReturnRate = getLatestInvestmentActualReturnRateByInvestmentId(investment.getInvestmentId());
 
         return InvestmentWithInvestStatusWithInvestmentActualRateGetResponse.builder()
