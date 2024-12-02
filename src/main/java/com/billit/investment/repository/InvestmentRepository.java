@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface InvestmentRepository extends JpaRepository<Investment, Integer> {
 
@@ -15,6 +16,9 @@ public interface InvestmentRepository extends JpaRepository<Investment, Integer>
 
     @Query("SELECT i, s FROM Investment i JOIN InvestStatus s ON i.investmentId = s.investmentId WHERE i.userInvestorId = :userInvestorId")
     List<Object[]> findInvestmentWithStatusByUserInvestorId(@Param("userInvestorId") Integer userInvestorId);
+
+    @Query("SELECT i, s FROM Investment i JOIN InvestStatus s ON i.investmentId = s.investmentId WHERE i.investmentId = :investmentId")
+    Optional<Object[]> findInvestmentWithStatusByInvestmentId(@Param("investmentId") Integer investmentId);
 
     List<Investment> findByUserInvestorId(Integer userInvestorId);
     List<Investment> findByGroupId(Integer groupId);

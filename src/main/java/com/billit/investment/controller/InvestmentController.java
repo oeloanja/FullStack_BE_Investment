@@ -32,9 +32,15 @@ public class InvestmentController {
     }
 
     @GetMapping("/{userInvestorId}")
-    public ResponseEntity<List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse>> getInvestmentWithInvestStatusWithInvestmentActualRateByInvestorId(@PathVariable Integer userInvestorId) {
+    public ResponseEntity<List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse>> getInvestmentWithInvestStatusWithInvestmentActualRateByUserInvestorId(@PathVariable Integer userInvestorId) {
         List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> results = investmentService.getInvestmentWithInvestStatusWithInvestmentActualRateByInvestorId(userInvestorId);
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/{investmentId}")
+    public ResponseEntity<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(@PathVariable Integer investmentId) {
+        InvestmentWithInvestStatusWithInvestmentActualRateGetResponse result = investmentService.getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(investmentId);
+        return ResponseEntity.ok(result);
     }
 
     // 현숙언니가 부를 api (잔여 투자금 분배) - 수정 필요

@@ -178,6 +178,28 @@ public class InvestmentService {
                 .collect(Collectors.toList());
     }
 
+    public InvestmentWithInvestStatusWithInvestmentActualRateGetResponse getInvestmentWithInvestStatusWithInvestmentActualRateByinvestmentId(Integer investmentId) {
+        Object[] result = investmentRepository.findInvestmentWithStatusByInvestmentId(investmentId)
+                .orElseThrow(()->new IllegalArgumentException("Investment not found : " + investmentId +"is Wrong investment id"));
+
+        Investment investment = (Investment) result[0];
+        InvestStatus investStatus = (InvestStatus) result[1];
+        InvestmentActualReturnRate investmentActualReturnRate = getLatestInvestmentActualReturnRateByInvestmentId(investment.getInvestmentId());
+
+        return InvestmentWithInvestStatusWithInvestmentActualRateGetResponse.builder()
+                .investmentId(investment.getInvestmentId())
+                .groupId(investment.getGroupId())
+                .userInvestorId(investment.getUserInvestorId())
+                .accountInvestorId(investment.getAccountInvestorId())
+                .investmentAmount(investment.getInvestmentAmount())
+                .investmentDate(investment.getInvestmentDate())
+                .expectedReturnRate(investment.getExpectedReturnRate())
+                .createdAt(investment.getCreatedAt())
+                .investStatusType(investStatus.getInvestStatusType().getCode())
+                .actualReturnRate(investmentActualReturnRate != null ? investmentActualReturnRate.getActualReturnRate() : null)
+                .build();
+    }
+
     // 현숙언니가 대출군에서 필요금액 모집 마감 확인하고 불러줘야 하는 api : 투자실행일시 업데이트
     @Transactional
     public void updateInvestmentDatesByGroupId(Integer groupId) {
