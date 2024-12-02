@@ -231,6 +231,7 @@ public class InvestmentService {
     @Transactional
     public List<Investment> updateSettlementRatio(InvestmentSettlementRatioUpdateRequest request) {
         List<Investment> investments = investmentRepository.findByGroupId(request.getGroupId());
+        entityManager.flush();
         if(investments.isEmpty()){
             throw new IllegalArgumentException("No investments found for groupId: " + request.getGroupId());
         }
