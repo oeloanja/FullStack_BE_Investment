@@ -20,8 +20,10 @@ public class SettlementService {
         settlement.setInvestmentId(request.getInvestmentId());
         settlement.setSettlementPrincipal(request.getSettlementPrincipal());
         settlement.setSettlementProfit(request.getSettlementProfit());
+        settlementRepository.save(settlement);
+        settlementRepository.flush();
 
-        return settlementRepository.save(settlement);
+        return settlement;
     }
 
     public SettlementPrincipalAndProfitGetResponse getTotalSettlementPrincipalAndProfit(Integer investmentId){
