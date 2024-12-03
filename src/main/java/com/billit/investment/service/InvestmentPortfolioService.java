@@ -61,7 +61,7 @@ public class InvestmentPortfolioService {
     }
 
     @Transactional
-    public InvestmentPortfolio updateInvestmentPortfolio(InvestmentPortfolioRequest request) {
+    public InvestmentPortfolio updatePortfolioTotalInvestedAmount(InvestmentPortfolioRequest request) {
         Integer userInvestorId = request.getUserInvestorId();
         InvestmentPortfolio portfolio = investmentPortfolioRepository
                 .findByUserInvestorId(userInvestorId)
@@ -69,19 +69,37 @@ public class InvestmentPortfolioService {
         List<Investment> investments = investmentRepository.findByUserInvestorId(userInvestorId);
 
         BigDecimal totalInvestedAmount = BigDecimal.ZERO;
+
+        for (Investment investment : investments) {
+            totalInvestedAmount = totalInvestedAmount.add(investment.getInvestmentAmount());
+        }
+
+        portfolio.setTotalInvestedAmount(totalInvestedAmount);
+        investmentPortfolioRepository.save(portfolio);
+        investmentPortfolioRepository.flush();
+
+        return portfolio;
+    }
+
+    @Transactional
+    public InvestmentPortfolio updateInvestmentPortfolioTotalReturnValueTotalReturnRate(InvestmentPortfolioRequest request) {
+        Integer userInvestorId = request.getUserInvestorId();
+        InvestmentPortfolio portfolio = investmentPortfolioRepository
+                .findByUserInvestorId(userInvestorId)
+                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));
+        List<Investment> investments = investmentRepository.findByUserInvestorId(userInvestorId);
+
         BigDecimal totalPrincipal = BigDecimal.ZERO;
         BigDecimal totalReturnValue = BigDecimal.ZERO;
 
         for (Investment investment : investments) {
             SettlementPrincipalAndProfitGetResponse response = settlementService.getTotalSettlementPrincipalAndProfit(investment.getInvestmentId());
-            totalInvestedAmount = totalInvestedAmount.add(investment.getInvestmentAmount());
             totalPrincipal = totalPrincipal.add(response.getTotalSettlementPrincipal());
             totalReturnValue = totalReturnValue.add(response.getTotalSettlementProfit());
         }
 
         BigDecimal totalReturnRate = totalReturnValue.divide(totalPrincipal, 2, RoundingMode.HALF_UP);
 
-        portfolio.setTotalInvestedAmount(totalInvestedAmount);
         portfolio.setTotalReturnValue(totalReturnValue);
         portfolio.setTotalReturnRate(totalReturnRate);
 

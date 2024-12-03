@@ -35,10 +35,16 @@ public class InvestmentPortfolioController {
         return ResponseEntity.ok(investmentPortfolioService.getPortfoliosByUserInvestorId(userInvestorId));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<InvestmentPortfolio> updateInvestmentPortfolio(
+    @PutMapping("/updatePortfolioTotalInvestedAmount")
+    public ResponseEntity<InvestmentPortfolio> updatePortfolioTotalInvestedAmount(
             @RequestBody InvestmentPortfolioRequest request) {
-        return ResponseEntity.ok(investmentPortfolioService.updateInvestmentPortfolio(request));
+        return ResponseEntity.ok(investmentPortfolioService.updatePortfolioTotalInvestedAmount(request));
+    }
+
+    @PutMapping("/updateInvestmentPortfolioTotalReturnValueTotalReturnRate")
+    public ResponseEntity<InvestmentPortfolio> updateInvestmentPortfolioTotalReturnValueTotalReturnRate(
+            @RequestBody InvestmentPortfolioRequest request) {
+        return ResponseEntity.ok(investmentPortfolioService.updateInvestmentPortfolioTotalReturnValueTotalReturnRate(request));
     }
 }
 
