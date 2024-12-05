@@ -208,11 +208,9 @@ public class InvestmentService {
             throw new IllegalArgumentException("No investments found for groupId: " + groupId);
         }
 
-        LocalDateTime nowTime = LocalDateTime.now();
-
         try {
             investments.forEach(investment -> {
-                investment.setInvestmentDate(nowTime);
+                investment.setInvestmentDate(LocalDateTime.now());
                 // 상태 업데이트를 한 번의 트랜잭션으로 처리
                 InvestStatus status = investStatusRepository.findById(investment.getInvestmentId())
                         .orElseThrow(() -> new IllegalArgumentException("Investment status not found"));
@@ -235,7 +233,6 @@ public class InvestmentService {
     @Transactional
     public List<Investment> updateSettlementRatio(InvestmentSettlementRatioUpdateRequest request) {
         List<Investment> investments = investmentRepository.findByGroupId(request.getGroupId());
-        entityManager.flush();
         if(investments.isEmpty()){
             throw new IllegalArgumentException("No investments found for groupId: " + request.getGroupId());
         }
@@ -253,7 +250,9 @@ public class InvestmentService {
                 })
                 .collect(Collectors.toList());
 
-        return investmentRepository.saveAll(updatedInvestments);
+        List<Investment> saved = investmentRepository.saveAll(updatedInvestments);
+        investmentRepository.flush(); // 여기서 flush
+        return saved;
     }
 
 
@@ -344,6 +343,8 @@ public class InvestmentService {
                 investment.setInvestmentAmount(investment.getInvestmentAmount().subtract(depositAmount));
                 investmentRepository.save(investment);
         });
+        investmentRepository.saveAll(investments);
+        investmentRepository.flush();
     }
 
     /* invest_status */

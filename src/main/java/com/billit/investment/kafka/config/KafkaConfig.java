@@ -1,7 +1,7 @@
 package com.billit.investment.kafka.config;
 
-import com.billit.common.event.ExcessRefundEvent;
-import com.billit.common.event.SettlementCalculationEvent;
+import com.billit.investment.kafka.event.ExcessRefundEvent;
+import com.billit.investment.kafka.event.SettlementCalculationEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -29,28 +29,39 @@ public class KafkaConfig {
     private String groupId;
 
     @Bean
-    public Map<String, Object> consumerConfigs() {
+    public Map<String, Object> baseConsumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         return props;
     }
 
     @Bean
     public ConsumerFactory<String, SettlementCalculationEvent> settlementCalculationEventConsumerFactory() {
+        Map<String, Object> props = new HashMap<>(baseConsumerConfigs());
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, CustomJsonDeserializer.class);
+        props.put("value.deserializer.type", SettlementCalculationEvent.class);  // 추가된 부분
+
         return new DefaultKafkaConsumerFactory<>(
-                consumerConfigs()
+                props,
+                new StringDeserializer(),
+                new CustomJsonDeserializer<>(SettlementCalculationEvent.class)
         );
     }
 
     @Bean
     public ConsumerFactory<String, ExcessRefundEvent> excessRefundEventConsumerFactory() {
+        Map<String, Object> props = new HashMap<>(baseConsumerConfigs());
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, CustomJsonDeserializer.class);
+        props.put("value.deserializer.type", ExcessRefundEvent.class);  // 추가된 부분
+
         return new DefaultKafkaConsumerFactory<>(
-                consumerConfigs()
+                props,
+                new StringDeserializer(),
+                new CustomJsonDeserializer<>(ExcessRefundEvent.class)
         );
     }
 
@@ -83,6 +94,29 @@ public class KafkaConfig {
                 },
                 new FixedBackOff(3000L, 3)
         );
+    }
+
+    @Bean
+    public ConsumerFactory<String, Integer> investmentDateUpdateEventConsumerFactory() {
+        Map<String, Object> props = new HashMap<>(baseConsumerConfigs());
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, CustomJsonDeserializer.class);
+        props.put("value.deserializer.type", Integer.class);
+
+        return new DefaultKafkaConsumerFactory<>(
+                props,
+                new StringDeserializer(),
+                new CustomJsonDeserializer<>(Integer.class)
+        );
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Integer>
+    investmentDateUpdateEventKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Integer> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(investmentDateUpdateEventConsumerFactory());
+        factory.setCommonErrorHandler(errorHandler());
+        return factory;
     }
 }
 
