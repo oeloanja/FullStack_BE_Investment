@@ -334,17 +334,15 @@ public class InvestmentService {
                     "차액 입금"
             );
 
-            // 투자자 계좌 입금 API 호출 : 확인 필요
             try {
                 userServiceClient.depositToAccount(Long.valueOf(investment.getUserInvestorId()), refundRequest);
             } catch (Exception e) {
                 throw new RuntimeException("투자금 잔액 입금 실패");
             }
-                investment.setInvestmentAmount(investment.getInvestmentAmount().subtract(depositAmount));
-                investmentRepository.save(investment);
+
+            BigDecimal newAmount = investment.getInvestmentAmount().subtract(depositAmount);
+            investmentRepository.updateInvestmentAmount(investment.getInvestmentId(), newAmount);
         });
-        investmentRepository.saveAll(investments);
-        investmentRepository.flush();
     }
 
     /* invest_status */

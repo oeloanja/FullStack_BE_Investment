@@ -3,6 +3,7 @@ package com.billit.investment.repository;
 import com.billit.investment.domain.Investment;
 import com.billit.investment.dto.InvestmentWithStatusDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -25,4 +26,8 @@ public interface InvestmentRepository extends JpaRepository<Investment, Integer>
     List<Investment> findByGroupId(Integer groupId);
 
     BigDecimal findInvestmentAmountByInvestmentId(Integer investmentId);
+
+    @Modifying
+    @Query("UPDATE Investment i SET i.investmentAmount = :amount WHERE i.investmentId = :investmentId")
+    void updateInvestmentAmount(@Param("investmentId") Integer investmentId, @Param("amount") BigDecimal amount);
 }
