@@ -27,6 +27,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -113,7 +114,7 @@ public class InvestmentService {
 
         // 투자금 출금 요청
         log.debug("Requesting withdrawal for user: {}", request.getUserInvestorId());
-        userServiceClient.withdrawInvest(Long.valueOf(request.getUserInvestorId()), userRequest);
+        userServiceClient.withdrawInvest(request.getUserInvestorId(), userRequest);
 
         // 투자금 입금 요청
         log.debug("Requesting platform account update for group: {}", request.getGroupId());
@@ -150,7 +151,7 @@ public class InvestmentService {
                 .collect(Collectors.toList());
     }
 
-    public List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getInvestmentWithInvestStatusWithInvestmentActualRateByInvestorId(Integer userInvestorId) {
+    public List<InvestmentWithInvestStatusWithInvestmentActualRateGetResponse> getInvestmentWithInvestStatusWithInvestmentActualRateByInvestorId(UUID userInvestorId) {
         List<Object[]> results = investmentRepository.findInvestmentWithStatusByUserInvestorId(userInvestorId);
         return results.stream()
                 .map(result -> {
@@ -292,7 +293,7 @@ public class InvestmentService {
                 );
 
                try {
-                   userServiceClient.depositToAccount(Long.valueOf(investment.getUserInvestorId()), depositRequest);
+                   userServiceClient.depositToAccount(investment.getUserInvestorId(), depositRequest);
                } catch (Exception e) {
                    throw new RuntimeException("정산금 입금 실패");
                }
@@ -335,7 +336,7 @@ public class InvestmentService {
             );
 
             try {
-                userServiceClient.depositToAccount(Long.valueOf(investment.getUserInvestorId()), refundRequest);
+                userServiceClient.depositToAccount(investment.getUserInvestorId(), refundRequest);
             } catch (Exception e) {
                 throw new RuntimeException("투자금 잔액 입금 실패");
             }

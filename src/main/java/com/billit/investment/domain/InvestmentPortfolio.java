@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -18,7 +19,7 @@ public class InvestmentPortfolio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer portfolioId;
 
-    private Integer userInvestorId;
+    private UUID userInvestorId;
     private BigDecimal totalInvestedAmount;
     private BigDecimal totalReturnValue;
     private BigDecimal totalReturnRate;

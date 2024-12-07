@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class InvestmentPortfolioService {
 
     @Transactional
     public InvestmentPortfolio createInvestmentPortfolio(InvestmentPortfolioRequest request) {
-        Integer userInvestorId = request.getUserInvestorId();
+        UUID userInvestorId = request.getUserInvestorId();
         List<Investment> investments = investmentRepository.findByUserInvestorId(userInvestorId);
 
         BigDecimal totalInvestedAmount = BigDecimal.ZERO;
@@ -44,7 +45,7 @@ public class InvestmentPortfolioService {
         return portfolio;
     }
 
-    public InvestmentPortfolio getPortfoliosByUserInvestorId(Integer userInvestorId) {
+    public InvestmentPortfolio getPortfoliosByUserInvestorId(UUID userInvestorId) {
         InvestmentPortfolio portfolio = investmentPortfolioRepository
                 .findByUserInvestorId(userInvestorId)
                 .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));
@@ -62,7 +63,7 @@ public class InvestmentPortfolioService {
 
     @Transactional
     public InvestmentPortfolio updatePortfolioTotalInvestedAmount(InvestmentPortfolioRequest request) {
-        Integer userInvestorId = request.getUserInvestorId();
+        UUID userInvestorId = request.getUserInvestorId();
         InvestmentPortfolio portfolio = investmentPortfolioRepository
                 .findByUserInvestorId(userInvestorId)
                 .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));
@@ -83,7 +84,7 @@ public class InvestmentPortfolioService {
 
     @Transactional
     public InvestmentPortfolio updateInvestmentPortfolioTotalReturnValueTotalReturnRate(InvestmentPortfolioRequest request) {
-        Integer userInvestorId = request.getUserInvestorId();
+        UUID userInvestorId = request.getUserInvestorId();
         InvestmentPortfolio portfolio = investmentPortfolioRepository
                 .findByUserInvestorId(userInvestorId)
                 .orElseThrow(() -> new IllegalArgumentException("Portfolio not found for investorId: " + userInvestorId));

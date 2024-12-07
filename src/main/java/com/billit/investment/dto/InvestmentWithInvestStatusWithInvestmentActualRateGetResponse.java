@@ -5,13 +5,14 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Builder
 public class InvestmentWithInvestStatusWithInvestmentActualRateGetResponse {
     private Integer investmentId;
     private Integer groupId;
-    private Integer userInvestorId;
+    private UUID userInvestorId;
     private Integer accountInvestorId;
     private BigDecimal investmentAmount;
     private LocalDateTime investmentDate;
