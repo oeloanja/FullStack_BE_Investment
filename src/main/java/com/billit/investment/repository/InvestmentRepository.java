@@ -28,6 +28,8 @@ public interface InvestmentRepository extends JpaRepository<Investment, Integer>
 
     BigDecimal findInvestmentAmountByInvestmentId(Integer investmentId);
 
+    Optional<Investment> findTopByGroupIdOrderByCreatedAtDesc(Integer groupId);
+
     @Modifying
     @Query("UPDATE Investment i SET i.investmentAmount = :amount WHERE i.investmentId = :investmentId")
     void updateInvestmentAmount(@Param("investmentId") Integer investmentId, @Param("amount") BigDecimal amount);
