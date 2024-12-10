@@ -134,6 +134,15 @@ public class InvestmentController {
         return ResponseEntity.ok(status);
     }
 
+    @PutMapping("/{groupId}/status/update")
+    public ResponseEntity<String> updateInvestmentStatusByGroupId(
+            @PathVariable Integer groupId,
+            @RequestParam InvestStatusType statusType) {
+        investmentService.updateInvestmentStatusByGroupId(groupId, statusType);
+        String response = "investment status update successful.";
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{investmentId}/status/cancel")
     public ResponseEntity<InvestStatus> cancelInvestment(@PathVariable Integer investmentId) {
         InvestStatus status = investmentService.cancelInvestmentStatus(investmentId);

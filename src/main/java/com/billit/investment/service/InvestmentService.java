@@ -363,6 +363,26 @@ public class InvestmentService {
         return investStatusRepository.save(status);
     }
 
+    public void updateInvestmentStatusByGroupId(Integer groupId, InvestStatusType statusType) {
+        List<Investment> investments = investmentRepository.findByGroupId(groupId);
+        if (investments.isEmpty()) {
+            throw new IllegalArgumentException("No investments found for groupId: " + groupId);
+        }
+        try {
+            investments.forEach(investment -> {
+                // 상태 업데이트를 한 번의 트랜잭션으로 처리
+                InvestStatus status = investStatusRepository.findById(investment.getInvestmentId())
+                        .orElseThrow(() -> new IllegalArgumentException("Investment status not found"));
+                status.setInvestStatusType(statusType);
+                investStatusRepository.save(status);
+            });
+            investmentRepository.saveAll(investments);
+        } catch (Exception e) {
+            log.error("Failed to update investment status for groupId: {}", groupId, e);
+            throw new RuntimeException("업데이트 실패: " + e.getMessage());
+        }
+    }
+
     public InvestStatus cancelInvestmentStatus(Integer investmentId) {
         InvestStatus status = investStatusRepository.findById(investmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Investment ID not found"));
